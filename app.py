@@ -7,12 +7,22 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('login.html')
 
-@socketio.on('posli_odpoved')
-def handle_odpoved(data):
-    print("Přijatá odpověď:", data)
-    emit('nova_odpoved', data, broadcast=True)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        session['username'] = username  # Uložení jména do session
+        return redirect(url_for('chat'))  # Přesměrování na chat po přihlášení
+    return render_template('login.html')
+
+@app.route('/chat')
+def chat():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Pokud není uživatel přihlášen, přesměruj na login
+    return render_template('chat.html', username=session['username'])
+
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)
