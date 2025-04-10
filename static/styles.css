@@ -6,8 +6,21 @@ body {
   display: flex;
   flex-direction: column;
 }
-hlavni {
-  display: gridl;
+.staty {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.zahlavi {
+  display: flex;
+  flex-direction: column;
+}
+.komunikace {
+  display: flex;
+  flex-direction: column;
+}
+.hlavni {
+  display: grid;
   grid-templates-column: 1fr 1fr 1fr;
 }
 ul {
