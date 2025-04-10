@@ -3,25 +3,38 @@ body {
   margin: auto; 
   background-color: rgb(238, 204, 86);
   text-align: center;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-templates-columns: 1fr 1fr 1fr;
+  grid-templates-rows: 100px 200px auto auto;
 }
 .staty {
+  grid-column: 1/4;
+  grid-row: 2/3;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-.zahlavi {
-  display: flex;
-  flex-direction: column;
+.nadpis {
+  grid-column: 1/4;
+  grid-row: 1/2;
 }
 .komunikace {
+  grid-column: 1/4;
+  grid-row: 4/5;
   display: flex;
   flex-direction: column;
 }
-.hlavni {
-  display: grid;
-  grid-templates-column: 1fr 1fr 1fr;
+.bloky {
+  grid-row: 3/4;
+}
+.ulohy {
+  grid-column: 1/2;
+}
+.banka {
+  grid-column: 2/3;
+}
+.zavody {
+  grid-column: 3/4;
 }
 ul {
   list-style-type: none;
