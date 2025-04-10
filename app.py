@@ -14,13 +14,13 @@ def index():
 def login():
     username = request.args.get('username')
     session_data['username'] = username  # Uložení jména do session
-    return render_template('soutez.html', username=username) #redirect(url_for('soutez'))
+    return redirect(url_for('soutez')) #render_template('soutez.html', username=username) #
 
 @app.route('/soutez')
 def soutez():
-    if 'username' not in session:
-        return redirect(url_for(''))  # Pokud není uživatel přihlášen, přesměruj na login
-    return render_template('soutez.html', username=session['username'])
+    if 'username' not in session_data:
+        return redirect(url_for('index'))  # Pokud není uživatel přihlášen, přesměruj na login
+    return render_template('soutez.html', username=session_data['username'])
 
 
 if __name__ == '__main__':
