@@ -8,6 +8,6 @@ function Login() {
         alert("Přihlásil ses. Super!!!")
     }
     else {
-        document.getElementByID("upozorneni").style.display = "block";
+        document.getElementById("upozorneni").style.display = "block";
     } 
 }
