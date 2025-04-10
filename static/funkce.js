@@ -1,7 +1,12 @@
 function Login() {
     let data = {};
-    document.querySelectorAll("input[type='number']").forEach(input => {
+    document.querySelectorAll("input[type='text']").forEach(input => {
         data[input.name] = input.value;
     });
-  location = "/login?username="+data.username
+    if (data.heslo == "Proud2025") {
+        location = "/login?username="+data.username
+    }
+    else {
+        document.GetElementByID("upozorneni").style.display("block")
+    } 
 }
