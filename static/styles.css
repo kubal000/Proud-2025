@@ -1,7 +1,10 @@
 body {
   width: 1000px;
   margin: auto; 
-  background-color: eecc56;
+  background-color: rgb(238, 204, 86);
   text-align: center;
+}
+ul {
+  list-style-type: none;
 }
 
