@@ -1,4 +1,5 @@
 function Login() {
+    alert("Spusteno")
     let data = {};
     document.querySelectorAll("input[type='text']").forEach(input => {
         data[input.name] = input.value;
