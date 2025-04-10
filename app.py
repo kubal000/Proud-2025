@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
-session = {}
+session_data = {}
 
 @app.route('/')
 def index():
@@ -12,8 +12,8 @@ def index():
 
 @app.route('/login', methods=['GET'])
 def login():
-    #username = request.args('username')
-    #session['username'] = username  # Uložení jména do session
+    username = request.args.get('username')
+    session_data['username'] = username  # Uložení jména do session
     return render_template('soutez.html', username=username) #redirect(url_for('soutez'))
 
 @app.route('/soutez')
