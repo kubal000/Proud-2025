@@ -12,9 +12,9 @@ def index():
 
 @app.route('/login', methods=['GET'])
 def login():
-    username = request.args('username')
+    #username = request.args('username')
     #session['username'] = username  # Uložení jména do session
-    return render_template('soutez.html', username=username) #redirect(url_for('soutez'))
+    return render_template('soutez.html', username=None) #redirect(url_for('soutez'))
 
 @app.route('/soutez')
 def soutez():
