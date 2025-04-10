@@ -3,6 +3,8 @@ body {
   margin: auto; 
   background-color: rgb(238, 204, 86);
   text-align: center;
+  display: flex;
+  flex-direction:row;
 }
 ul {
   list-style-type: none;
