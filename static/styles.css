@@ -4,7 +4,11 @@ body {
   background-color: rgb(238, 204, 86);
   text-align: center;
   display: flex;
-  flex-direction:row;
+  flex-direction: column;
+}
+hlavni {
+  display: gridl;
+  grid-templates-column: 1fr 1fr 1fr;
 }
 ul {
   list-style-type: none;
