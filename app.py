@@ -11,11 +11,9 @@ def index():
 
 @app.route('/login', methods=['GET'])
 def login():
-    if request.method == 'POST':
-        username = request.get('username')
-        session['username'] = username  # Uložení jména do session
-        return redirect(url_for('chat'))  # Přesměrování na chat po přihlášení
-    return render_template('login.html')
+    username = request.get('username')
+    session['username'] = username  # Uložení jména do session
+    return render_template('soutez.html')
 
 @app.route('/chat')
 def chat():
