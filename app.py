@@ -18,7 +18,7 @@ def login():
 @app.route('/chat')
 def chat():
     if 'username' not in session:
-        return redirect(url_for('login'))  # Pokud není uživatel přihlášen, přesměruj na login
+        return redirect(url_for(''))  # Pokud není uživatel přihlášen, přesměruj na login
     return render_template('chat.html', username=session['username'])
 
 
