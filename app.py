@@ -53,6 +53,7 @@ def handle_send_message(data):
     target_sid = usernames.get(target_user)
     if target_sid:
         emit('receive_message', {'sender': sender_name, 'message': message}, to=target_sid)
+    emit('receive_message', {'sender': sender_name, 'message': message}, to=sender_sid)
 
 @socketio.on('register_username')
 def handle_register_username(data):
