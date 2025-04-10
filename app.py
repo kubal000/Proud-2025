@@ -9,6 +9,9 @@ socketio = SocketIO(app, async_mode='eventlet')
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
 
+def update_online_users():
+    emit('online_users', list(usernames.keys()), broadcast=True)
+
 @app.route('/')
 def index():
     return render_template('login.html')
@@ -37,7 +40,8 @@ def handle_disconnect():
     username = sid_to_username.pop(sid, None)
     if username and username in usernames:
         del usernames[username]
-    print('Odpojeno:', sid)
+        print('Odpojeno:', sid)
+        update_online_users()
 
 @socketio.on('send_message')
 def handle_send_message(data):
@@ -57,6 +61,7 @@ def handle_register_username(data):
         usernames[username] = request.sid
         sid_to_username[request.sid] = username
         print(f'{username} přihlášen jako {request.sid}')
+        update_online_users()
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)
