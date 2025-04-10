@@ -4,8 +4,8 @@ body {
   background-color: rgb(238, 204, 86);
   text-align: center;
   display: grid;
-  grid-templates-columns: 1fr 1fr 1fr;
-  grid-templates-rows: 100px 200px auto auto;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 100px 200px auto auto;
 }
 .staty {
   grid-column: 1/4;
