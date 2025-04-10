@@ -5,8 +5,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
 
-usernames = {}
-sid_to_username = {}
+# Pamatujeme si přihlášené uživatele a jejich připojení
+usernames = {}       # jméno → sid (socket id)
+sid_to_username = {} # sid → jméno
 
 @app.route('/')
 def index():
@@ -15,14 +16,16 @@ def index():
 @app.route('/login', methods=['GET'])
 def login():
     username = request.args.get('username')
-    session_data['username'] = username  # Uložení jména do session
-    return redirect(url_for('soutez')) #render_template('soutez.html', username=username) #
+    if username:
+        return redirect(url_for('soutez', username=username))
+    return redirect(url_for('index'))
 
 @app.route('/soutez')
 def soutez():
-    if 'username' not in session_data:
-        return redirect(url_for('index'))  # Pokud není uživatel přihlášen, přesměruj na login
-    return render_template('soutez.html', username=session_data['username'])
+    username = request.args.get('username')
+    if not username:
+        return redirect(url_for('index'))
+    return render_template('soutez.html', username=username)
 
 @socketio.on('connect')
 def handle_connect():
