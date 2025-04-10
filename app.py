@@ -9,10 +9,10 @@ socketio = SocketIO(app, async_mode='eventlet')
 def index():
     return render_template('login.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.get('username')
         session['username'] = username  # Uložení jména do session
         return redirect(url_for('chat'))  # Přesměrování na chat po přihlášení
     return render_template('login.html')
