@@ -4,6 +4,7 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
+session = {}
 
 @app.route('/')
 def index():
