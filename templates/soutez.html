@@ -8,14 +8,22 @@
     <link href="static/styles.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Herní pole pro tým: {{ username }}</h1>
-    
-    <label for="target_user">Příjemce:</label><label id="target_user">Editor</label>
-    <textarea id="message" placeholder="Napište zprávu..."></textarea>
-    <button onclick="sendMessage()">Poslat zprávu</button>
-    <h2>Online týmy:</h2>
-    <ul id="online_users"></ul>
-    <h2>Přijaté zprávy:</h2>
-    <ul id="messages"></ul>
+    <div class="zahlavi">
+        <h1>Herní pole pro tým: {{ username }}</h1>
+    </div>
+    <div class="hlavni">
+        <div class="ulohy bloky"></div>
+        <div class="banka bloky"></div>
+        <div class="zavody bloky"></div>
+    </div>
+    <div class="komunikace">
+        <label for="target_user">Příjemce:</label><label id="target_user">Editor</label>
+        <textarea id="message" placeholder="Napište zprávu..."></textarea>
+        <button onclick="sendMessage()">Poslat zprávu</button>
+        <h2>Online týmy:</h2>
+        <ul id="online_users"></ul>
+        <h2>Přijaté zprávy:</h2>
+        <ul id="messages"></ul>
+    </div>
 </body>
 </html>
