@@ -13,7 +13,7 @@ def index():
 def login():
     username = request.get('username')
     session['username'] = username  # Uložení jména do session
-    return redirect(url_for('soutez'))
+    return  render_template("soutez.html", username= username) //redirect(url_for('soutez'))
 
 @app.route('/soutez')
 def soutez():
