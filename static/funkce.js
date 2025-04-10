@@ -21,6 +21,17 @@ window.addEventListener("load", () => {
     }
 });
 
+socket.on('online_users', function(userList) {
+    const onlineBox = document.getElementById("online_users");
+    onlineBox.innerHTML = ""; // Vyčistit
+
+    userList.forEach(username => {
+        const li = document.createElement("li");
+        li.textContent = username;
+        onlineBox.appendChild(li);
+    });
+});
+
 function sendMessage() {
     const targetUser = document.getElementById("target_user").value;
     const message = document.getElementById("message").value;
