@@ -4,7 +4,6 @@ function Login() {
         data[input.name] = input.value;
     });
     if (data.heslo == "Proud2025") {
-        alert("hop")
         location = "/login?username="+data.username
     }
     else {
