@@ -13,6 +13,14 @@ function Login() {
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
+window.addEventListener("load", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get("username");
+    if (username) {
+        socket.emit("register_username", { username: username });
+    }
+});
+
 function sendMessage() {
     const targetUser = document.getElementById("target_user").value;
     const message = document.getElementById("message").value;
