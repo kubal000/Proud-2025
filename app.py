@@ -13,13 +13,13 @@ def index():
 def login():
     username = request.get('username')
     session['username'] = username  # Uložení jména do session
-    return render_template('soutez.html')
+    return redirect(url_for('soutez')
 
-@app.route('/chat')
-def chat():
+@app.route('/soutez')
+def soutez():
     if 'username' not in session:
         return redirect(url_for(''))  # Pokud není uživatel přihlášen, přesměruj na login
-    return render_template('chat.html', username=session['username'])
+    return render_template('soutez.html', username=session['username'])
 
 
 if __name__ == '__main__':
