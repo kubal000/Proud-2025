@@ -1,5 +1,5 @@
-<DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="cs">
     <head>
         <meta charset="UTF-8">
         <title>Přihlášení na Proud 2025</title>
@@ -10,12 +10,20 @@
         <h1>Přihlaš se</h1>
         <p>Napiš sem jméno svého týmu, tak, jak se má zobrazovat na tabuli (tedy prosím nic polovičatého) a heslo které jsme si říkali před hrou.</p>
         <form id="prihlaseni">
-            <p><label for="username">Jméno týmu:</label>
-            <input type="text" id="username" name="username" required></p>
-            <p><label for="heslo">Heslo:</label>
-            <input type="text" id="heslo" name="heslo" required></p>
-            <div id="upozorneni" style="display: none; color: red">Toto heslo není správné, zeptej se organizátora soutěže</div>
-            <p><button type="button" onclick="Login()">Přihlásit se</button></p>
+            <p>
+                <label for="username">Jméno týmu:</label>
+                <input type="text" id="username" name="username" required>
+            </p>
+            <p>
+                <label for="heslo">Heslo:</label>
+                <input type="text" id="heslo" name="heslo" required>
+            </p>
+            <div id="upozorneni" style="display: none; color: red">
+                Toto heslo není správné, zeptej se organizátora soutěže
+            </div>
+            <p>
+                <button type="button" onclick="Login()">Přihlásit se</button>
+            </p>
         </form>
     </body>
 </html>
