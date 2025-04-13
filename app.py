@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect
 from flask_socketio import SocketIO, emit
-
+import pandas as pd
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
@@ -8,6 +8,13 @@ socketio = SocketIO(app, async_mode='eventlet')
 # Pamatujeme si přihlášené uživatele a jejich připojení
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
+
+def tabulka(tym, pole, cislo)
+    df = pd.read_csv("tymy.csv")
+    df.set_index('tym', inplace=True)
+    df.loc(tym, pole) += cislo
+    df.to_csv('tymy.csv', index=False)
+    return df.loc(tym, pole)
 
 def update_online_users():
     emit('online_users', list(usernames.keys()), broadcast=True)
