@@ -9,7 +9,7 @@ socketio = SocketIO(app, async_mode='eventlet')
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
 
-def tabulka(tym, pole, cislo):
+def tabulka(tym, pole, cislo):aaa
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
     df.loc(tym, pole) += cislo
