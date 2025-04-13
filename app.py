@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
 app = Flask(__name__)
@@ -12,9 +12,9 @@ sid_to_username = {} # sid → jméno
 def tabulka(tym, pole, cislo):
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
-    df.loc(tym, pole) += cislo
-    df.to_csv('tymy.csv', index=False)
-    return df.loc(tym, pole)
+    df.loc[tym, pole] = int(df.loc[tym, pole]) + cislo
+    df.to_csv('tymy.csv', index=True)
+    return str(df.loc[tym, pole])
 
 def update_online_users():
     emit('online_users', list(usernames.keys()), broadcast=True)
@@ -70,6 +70,15 @@ def handle_register_username(data):
         sid_to_username[request.sid] = username
         print(f'{username} přihlášen jako {request.sid}')
         update_online_users()
+
+@socketio.on('uloha')
+def uloha():   
+    emit('penize', {'penize': tabulka(sid_to_username.get(request.sid), 'penize', 50)})
+
+@socketio.on('zvedni')
+def zvedni(data):
+    # dokončit placení s ošetřením nevlastnění peněz
+    emit('faktory', {'faktor': data['faktor'], 'cislo': tabulka(sid_to_username.get(request.sid), data['faktor'], 1)})
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)

@@ -10,11 +10,47 @@
 <body>
     <h1 class="nadpis">Herní pole pro tým: {{ username }}</h1>
     <div class="staty">
-        <div>Peníze:</div><div id='penize'></div>
-        <div>Formule A:</div>
-        <div>Formule B:</div>
+        <div><div>Peníze:</div><div id='penize'>0 $</div></div>
+        <div>
+            Formule A:
+            <div style="display:flex;flex-direction:column">
+                <div style="display:flex;flex-direction:row">
+                    <div>
+                        Motor: 
+                    </div>
+                    <div id="A_motor">0</div>
+                    <button onclick="Zvedni('A_motor')"> Vylepši</button>
+                </div>
+                <div style="display:flex;flex-direction:row">
+                    <div>
+                        Brzda: 
+                    </div>
+                    <div id="A_brzda">0</div>
+                    <button onclick="Zvedni('A_brzda')"> Vylepši</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            Formule B:
+            <div style="display:flex;flex-direction:column">
+                <div style="display:flex;flex-direction:row">
+                    <div>
+                        Motor: 
+                    </div>
+                    <div id="B_motor">0</div>
+                    <button onclick="Zvedni('B_motor')"> Vylepši</button>
+                </div>
+                <div style="display:flex;flex-direction:row">
+                    <div>
+                        Brzda: 
+                    </div>
+                    <div id="B_brzda">0</div>
+                    <button onclick="Zvedni('B_brzda')"> Vylepši</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="ulohy bloky"><h3>Odevzádní úlohy</h3></div>
+    <div class="ulohy bloky"><h3>Odevzádní úlohy</h3><button onclick="Uloha()">Odevzdat další</button></div>
     <div class="banka bloky"> Banka</div>
     <div class="zavody bloky"> Zavody</div>
     <div class="komunikace">
@@ -25,19 +61,7 @@
         <button onclick="sendMessage()">Poslat zprávu</button>
         <h3>Tvá komunikace:</h3>
         <ul id="messages"></ul>
+        <ul id="online_users" style="display:none"></ul>
     </div>
-    <script onload="Init()">
-        function Init()
-            {
-                    NactiPenize();        
-            }
-        
-        function NactiPenize()
-            {
-                
-                let _penize = fetch....
-                    document.getElementById('penize').InnerHtml = _penize;
-            }
-    </script>
 </body>
 </html>

@@ -1,14 +1,19 @@
-function Login() {
-    let data = {};
-    document.querySelectorAll("input[type='text']").forEach(input => {
-        data[input.name] = input.value;
-    });
+function sendMessage() {
+    const targetUser = document.getElementById("target_user").textContent;
+    const message = document.getElementById("message").value;
 
-    if (data.heslo === "Proud2025") {
-        location.href = "/login?username=" + encodeURIComponent(data.username);
-    } else {
-        document.getElementById("upozorneni").style.display = "block";
-    }
+    socket.emit('send_message', {
+        target_user: targetUser,
+        message: message
+    });
+}
+
+function Uloha() {
+    socket.emit('uloha');
+}
+
+function Zvedni(faktor) {
+    socket.emit('zvedni', { 'faktor': faktor });
 }
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
@@ -32,19 +37,17 @@ socket.on('online_users', function(userList) {
     });
 });
 
-function sendMessage() {
-    const targetUser = document.getElementById("target_user").value;
-    const message = document.getElementById("message").value;
+socket.on('penize', (data) => {
+    document.getElementById("penize").textContent = data.penize + " $"
+})
 
-    socket.emit('send_message', {
-        target_user: targetUser,
-        message: message
-    });
-}
+socket.on('faktory', (data) => {
+    document.getElementById(data.faktor).textContent = data.cislo
+})
 
-socket.on('receive_message', function(data) {
+socket.on('receive_message', function (data) {
     const messages = document.getElementById("messages");
     const messageItem = document.createElement("li");
     messageItem.textContent = data.sender + ": " + data.message;
     messages.appendChild(messageItem);
-});
+})

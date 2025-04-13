@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Přihlášení na Proud 2025</title>
-        <script src="static/funkce.js"></script>
+
         <link href="static/styles.css" rel="stylesheet">
     </head>
     <body>
@@ -25,5 +25,19 @@
                 <button type="button" onclick="Login()">Přihlásit se</button>
             </p>
         </form>
+        <script>
+            function Login() {
+                let data = {};
+                document.querySelectorAll("input[type='text']").forEach(input => {
+                    data[input.name] = input.value;
+                });
+
+                if (data.heslo === "Proud2025") {
+                    location.href = "/login?username=" + encodeURIComponent(data.username);
+                } else {
+                    document.getElementById("upozorneni").style.display = "block";
+                }
+            }
+        </script>
     </body>
 </html>
