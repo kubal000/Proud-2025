@@ -10,11 +10,11 @@
 <body>
     <h1 class="nadpis">Herní pole pro tým: {{ username }}</h1>
     <div class="staty">
-        <div>Peníze:</div>
+        <div>Peníze:</div><div id='penize'></div>
         <div>Formule A:</div>
         <div>Formule B:</div>
     </div>
-    <div class="ulohy bloky"> Ulohy</div>
+    <div class="ulohy bloky"><h3>Odevzádní úlohy</h3></div>
     <div class="banka bloky"> Banka</div>
     <div class="zavody bloky"> Zavody</div>
     <div class="komunikace">
@@ -26,5 +26,18 @@
         <h3>Tvá komunikace:</h3>
         <ul id="messages"></ul>
     </div>
+    <script onload="Init()">
+        function Init()
+            {
+                    NactiPenize();        
+            }
+        
+        function NactiPenize()
+            {
+                
+                let _penize = fetch....
+                    document.getElementById('penize').InnerHtml = _penize;
+            }
+    </script>
 </body>
 </html>
