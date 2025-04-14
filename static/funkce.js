@@ -16,6 +16,10 @@ function Zvedni(faktor) {
     socket.emit('zvedni', { 'faktor': faktor });
 }
 
+function Init() {
+    socket.emit('init');
+}
+
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
 window.addEventListener("load", () => {
@@ -42,7 +46,14 @@ socket.on('penize', (data) => {
 })
 
 socket.on('faktory', (data) => {
-    document.getElementById(data.faktor).textContent = data.cislo
+    if (data.cislo == False) {
+        alert("Nemáš dostatek peněz na vylepšení")
+    }
+    else {
+        document.getElementById(data.faktor).textContent = "Level: " + data.cislo
+        document.getElementById(data.faktor + "b").textContent = "Vylepši za: " + data.dalsicena + "$"
+    }
+    
 })
 
 socket.on('receive_message', function (data) {

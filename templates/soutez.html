@@ -7,7 +7,7 @@
     <script src="static/funkce.js"></script>
     <link href="static/styles.css" rel="stylesheet">
 </head>
-<body>
+<body onload="Init()">
     <h1 class="nadpis">Herní pole pro tým: {{ username }}</h1>
     <div class="staty">
         <div><div>Peníze:</div><div id='penize'>0 $</div></div>
@@ -19,14 +19,14 @@
                         Motor: 
                     </div>
                     <div id="A_motor">0</div>
-                    <button onclick="Zvedni('A_motor')"> Vylepši</button>
+                    <button onclick="Zvedni('A_motor')" id="A_motorb">Vylepši za 50 $</button>
                 </div>
                 <div style="display:flex;flex-direction:row">
                     <div>
                         Brzda: 
                     </div>
                     <div id="A_brzda">0</div>
-                    <button onclick="Zvedni('A_brzda')"> Vylepši</button>
+                    <button onclick="Zvedni('A_brzda')" id="A_brzdab">Vylepši za 50 $</button>
                 </div>
             </div>
         </div>
@@ -38,14 +38,14 @@
                         Motor: 
                     </div>
                     <div id="B_motor">0</div>
-                    <button onclick="Zvedni('B_motor')"> Vylepši</button>
+                    <button onclick="Zvedni('B_motor')" id="B_motorb">Vylepši za 50 $</button>
                 </div>
                 <div style="display:flex;flex-direction:row">
                     <div>
                         Brzda: 
                     </div>
                     <div id="B_brzda">0</div>
-                    <button onclick="Zvedni('B_brzda')"> Vylepši</button>
+                    <button onclick="Zvedni('B_brzda')" id="B_brzdab">Vylepši za 50 $</button>
                 </div>
             </div>
         </div>
