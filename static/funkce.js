@@ -46,11 +46,11 @@ socket.on('penize', (data) => {
 })
 
 socket.on('faktory', (data) => {
-    if (data.cislo == False) {
+    if (data.cislo === false) {
         alert("Nemáš dostatek peněz na vylepšení")
     }
     else {
-        document.getElementById(data.faktor).textContent = "Level: " + data.cislo
+        document.getElementById(data.faktor).textContent = "level " + data.cislo + " "
         document.getElementById(data.faktor + "b").textContent = "Vylepši za: " + data.dalsicena + "$"
     }
     

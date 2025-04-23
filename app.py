@@ -1,4 +1,3 @@
-from tokenize import tabsize
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
@@ -31,9 +30,13 @@ def index():
 @app.route('/login', methods=['GET'])
 def login():
     username = request.args.get('username')
-    if username:
+    heslo = request.args.get('heslo')
+    if heslo == 'Proud2025':
         return redirect(url_for('soutez', username=username))
-    return redirect(url_for('index'))
+    elif heslo == 'Proud2025e' and username == 'Editor':
+        return redirect(url_for('editor', username=username))
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/soutez')
 def soutez():
@@ -41,6 +44,13 @@ def soutez():
     if not username:
         return redirect(url_for('index'))
     return render_template('soutez.html', username=username)
+
+@app.route('/editor')
+def editor():
+    username = request.args.get('username')
+    if not username:
+        return redirect(url_for('index'))
+    return render_template('editor.html', username=username)
 
 @socketio.on('connect')
 def handle_connect():
@@ -77,7 +87,7 @@ def handle_register_username(data):
         update_online_users()
 
 @socketio.on('uloha')
-def uloha():   
+def uloha(data=None):   
     emit('penize', {'penize': tabulka(sid_to_username.get(request.sid), 'penize', 50)})
 
 @socketio.on('zvedni')
@@ -87,22 +97,25 @@ def zvedni(data):
     tym = sid_to_username.get(request.sid)
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
-    df = df.loc[tym, faktor]
-    penize = tabulka(tym, 'penize', -25*(df+2))
+    vec = df.loc[tym, faktor]
+    penize = tabulka(tym, 'penize', -25*(vec+2))
     if penize == False:
         emit('faktory', {'faktor': faktor, 'cislo': False, 'dalsicena': False})
     else:
         emit('penize', {'penize': penize})
-        emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(-25*(df+3))})
+        emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
 
 @socketio.on('init')
-def Init():
+def init():
     tym = sid_to_username.get(request.sid)
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
+    if tym not in df.index:
+        df.loc[tym] = [0, 0, 0, 0, 0, 0]           # nastavení základních hodnot
+        df.to_csv('tymy.csv', index=True)
     emit('penize', {'penize': str(df.loc[tym, 'penize'])})
     for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
-        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(-25*(df.loc[tym, faktor]+2))}) #nefunguje, dodělat
+        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(25*(df.loc[tym, faktor]+2))})
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)

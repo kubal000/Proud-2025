@@ -8,7 +8,18 @@
     <link href="static/styles.css" rel="stylesheet">
 </head>
 <body>
+    <div style="display:flex; flex-direction:column">
         <h2>Online týmy:</h2>
         <ul id="online_users"></ul>
+        <h2>Zprávy</h2>
+        <div style="display:flex; flex-direction:row">
+            <label for="target_user">Příjemce: </label>
+            <input id="target_user">
+            <textarea id="message" placeholder="Napište zprávu..."></textarea>
+            <button onclick="sendMessage()">Poslat zprávu</button>
+        </div>
+        <h3>Tvá komunikace:</h3>
+        <ul id="messages" style="display:flex; flex-direction:column-reverse"></ul>
+    </div>
 </body>
 </html>
