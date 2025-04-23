@@ -1,5 +1,10 @@
 function sendMessage() {
-    const targetUser = document.getElementById("target_user").textContent;
+    const elem = document.getElementById("target_user");
+    if (elem.tagName === "INPUT") {
+        targetUser = elem.value;
+    } else {
+        targetUser = elem.textContent;
+    }
     const message = document.getElementById("message").value;
 
     socket.emit('send_message', {
@@ -18,6 +23,11 @@ function Zvedni(faktor) {
 
 function Init() {
     socket.emit('init');
+}
+
+function StartTimer() {
+    socket.emit('start_timer');
+    document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
 }
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
@@ -61,4 +71,12 @@ socket.on('receive_message', function (data) {
     const messageItem = document.createElement("li");
     messageItem.textContent = data.sender + ": " + data.message;
     messages.appendChild(messageItem);
+})
+
+socket.on('casovac', (data) => {
+    document.getElementById("casovac").textContent = data.cas
+    if (data.cas === '00:00:00') {
+        document.getElementById("casovac").textContent = "Čas vypršel"
+        document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
+    }
 })

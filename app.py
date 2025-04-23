@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
+import time
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
@@ -8,6 +10,19 @@ socketio = SocketIO(app, async_mode='eventlet')
 # Pamatujeme si přihlášené uživatele a jejich připojení
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
+
+def casovac(sid, cas):
+    konec = time.time() + cas
+    while True:
+        zbyva = int(konec - time.time())
+        if zbyva <= 0:
+            socketio.emit('casovac', {'cas': '00:00:00'}, to=sid)
+            break
+        h = zbyva // 3600
+        m = (zbyva % 3600) // 60
+        s = zbyva % 60
+        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=sid)
+        socketio.sleep(1)
 
 def tabulka(tym, pole, cislo):
     df = pd.read_csv("tymy.csv")
@@ -23,9 +38,12 @@ def tabulka(tym, pole, cislo):
 def update_online_users():
     emit('online_users', list(usernames.keys()), broadcast=True)
 
+#   SPUSTENI
 @app.route('/')
 def index():
     return render_template('login.html')
+
+#   LOGIN
 
 @app.route('/login', methods=['GET'])
 def login():
@@ -52,9 +70,30 @@ def editor():
         return redirect(url_for('index'))
     return render_template('editor.html', username=username)
 
+@socketio.on('init')
+def init():
+    tym = sid_to_username.get(request.sid)
+    df = pd.read_csv("tymy.csv")
+    df.set_index('tym', inplace=True)
+    if tym not in df.index:
+        df.loc[tym] = [0, 0, 0, 0, 0, 0]           # nastavení základních hodnot
+        df.to_csv('tymy.csv', index=True)
+    emit('penize', {'penize': str(df.loc[tym, 'penize'])})
+    for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
+        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(25*(df.loc[tym, faktor]+2))})
+
 @socketio.on('connect')
 def handle_connect():
     print('Uživatel připojen:', request.sid)
+
+@socketio.on('register_username')
+def handle_register_username(data):
+    username = data.get('username')
+    if username:
+        usernames[username] = request.sid
+        sid_to_username[request.sid] = username
+        print(f'{username} přihlášen jako {request.sid}')
+        update_online_users()
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -64,6 +103,8 @@ def handle_disconnect():
         del usernames[username]
         print('Odpojeno:', sid)
         update_online_users()
+
+# AKCE
 
 @socketio.on('send_message')
 def handle_send_message(data):
@@ -76,15 +117,6 @@ def handle_send_message(data):
     if target_sid:
         emit('receive_message', {'sender': sender_name, 'message': message}, to=target_sid)
     emit('receive_message', {'sender': sender_name, 'message': message}, to=sender_sid)
-
-@socketio.on('register_username')
-def handle_register_username(data):
-    username = data.get('username')
-    if username:
-        usernames[username] = request.sid
-        sid_to_username[request.sid] = username
-        print(f'{username} přihlášen jako {request.sid}')
-        update_online_users()
 
 @socketio.on('uloha')
 def uloha(data=None):   
@@ -105,17 +137,11 @@ def zvedni(data):
         emit('penize', {'penize': penize})
         emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
 
-@socketio.on('init')
-def init():
-    tym = sid_to_username.get(request.sid)
-    df = pd.read_csv("tymy.csv")
-    df.set_index('tym', inplace=True)
-    if tym not in df.index:
-        df.loc[tym] = [0, 0, 0, 0, 0, 0]           # nastavení základních hodnot
-        df.to_csv('tymy.csv', index=True)
-    emit('penize', {'penize': str(df.loc[tym, 'penize'])})
-    for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
-        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(25*(df.loc[tym, faktor]+2))})
+#   CASOMIRY
+
+@socketio.on('start_timer')
+def start_timer():
+    socketio.start_background_task(casovac, request.sid, 60)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)
