@@ -102,3 +102,35 @@ socket.on('banka', (data) => {
         dluh.remove()
     }
 });
+
+socket.on('tabulka', function (data) {
+    const table = document.getElementById("tabulka");
+    const body = table.querySelector("tbody");
+    const head = table.querySelector("thead");
+    if (body) {
+        body.remove();
+    }
+    if (head) {
+        head.remove();
+    }
+    
+    const thead = table.createTHead();
+    const headerRow = thead.insertRow();
+    
+
+    data.columns.forEach(col => {
+        const th = document.createElement("th");
+        th.textContent = col;
+        headerRow.appendChild(th);
+    });
+    const tbody = table.createTBody();
+    data.rows.forEach(row => {
+        const tr = tbody.insertRow();
+        data.columns.forEach(col => {
+            const td = tr.insertCell();
+            td.textContent = row[col];
+        });
+    });
+
+    document.body.appendChild(table);
+});

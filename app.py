@@ -33,6 +33,14 @@ def tabulka(tym, pole, cislo):
         df.to_csv('tymy.csv', index=True)
         return False
     df.to_csv('tymy.csv', index=True)
+    Editor = usernames.get('Editor')
+    if Editor:
+        df['tym'] = df.index
+        columns = ['tym'] + [col for col in df.columns if col != 'tym']
+        data = df[columns].to_dict(orient='records')
+        
+        socketio.emit('tabulka', {'columns': columns, 'rows': data}, to=Editor)
+    
     return str(df.loc[tym, pole])
 
 def ulozeni(sid, suma):
