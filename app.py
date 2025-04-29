@@ -35,6 +35,21 @@ def tabulka(tym, pole, cislo):
     df.to_csv('tymy.csv', index=True)
     return str(df.loc[tym, pole])
 
+def ulozeni(sid, suma):
+    konec = time.time() + 10
+    idb = time.time()
+    while True:
+        zbyva = int(konec - time.time())
+        if zbyva <= 0:
+            socketio.emit('banka', {'cas': '00:00:00', 'idb': idb, 'suma': suma}, to=sid)
+            socketio.emit('penize', {'penize': tabulka(sid_to_username.get(sid), 'penize', int(suma*1.1))}, to=sid)
+            break
+        h = zbyva // 3600
+        m = (zbyva % 3600) // 60
+        s = zbyva % 60
+        socketio.emit('banka', {'cas': f'{h:02d}:{m:02d}:{s:02d}', 'idb': idb, 'suma': suma}, to=sid)
+        socketio.sleep(1)
+
 def update_online_users():
     emit('online_users', list(usernames.keys()), broadcast=True)
 
@@ -137,11 +152,21 @@ def zvedni(data):
         emit('penize', {'penize': penize})
         emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
 
+@socketio.on('uloz')
+def Uloz(data):
+    suma = int(data['suma'])
+    penize = tabulka(sid_to_username.get(request.sid), 'penize', -suma)
+    if penize == False:
+        emit('chyba', {'zprava': 'Nemůžeš uložit peníze které nemáš!!!'})
+    else:
+        emit('penize', {'penize': penize})
+        socketio.start_background_task(ulozeni, request.sid, suma)
+
 #   CASOMIRY
 
 @socketio.on('start_timer')
-def start_timer():
-    socketio.start_background_task(casovac, request.sid, 60)
+def start_timer(data):
+    socketio.start_background_task(casovac, request.sid, data['cas'])
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)

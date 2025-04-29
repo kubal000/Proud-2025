@@ -25,8 +25,12 @@ function Init() {
     socket.emit('init');
 }
 
+function Uloz() {  
+    socket.emit('uloz', { 'suma': document.getElementById('ulozeni').value});
+}
+
 function StartTimer() {
-    socket.emit('start_timer');
+    socket.emit('start_timer', {'cas': 60});
     document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
 }
 
@@ -53,7 +57,11 @@ socket.on('online_users', function(userList) {
 
 socket.on('penize', (data) => {
     document.getElementById("penize").textContent = data.penize + " $"
-})
+});
+
+socket.on('chyba', (data) => {
+    alert(data.zprava)
+});
 
 socket.on('faktory', (data) => {
     if (data.cislo === false) {
@@ -63,15 +71,15 @@ socket.on('faktory', (data) => {
         document.getElementById(data.faktor).textContent = "level " + data.cislo + " "
         document.getElementById(data.faktor + "b").textContent = "Vylepši za: " + data.dalsicena + "$"
     }
-    
-})
+
+});
 
 socket.on('receive_message', function (data) {
     const messages = document.getElementById("messages");
     const messageItem = document.createElement("li");
     messageItem.textContent = data.sender + ": " + data.message;
     messages.appendChild(messageItem);
-})
+});
 
 socket.on('casovac', (data) => {
     document.getElementById("casovac").textContent = data.cas
@@ -79,4 +87,17 @@ socket.on('casovac', (data) => {
         document.getElementById("casovac").textContent = "Čas vypršel"
         document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
     }
-})
+});
+
+socket.on('banka', (data) => {
+    const banka = document.getElementById("dluhy");
+    let dluh = document.getElementById(data.idb);
+    if (!dluh) {
+        dluh = document.createElement("li");
+        dluh.id = data.idb;
+    }
+    dluh.textContent = "Uloženo: " + data.suma + "$, ještě: " + data.cas;
+    if (data.cas === '00:00:00') {
+        dluh.remove()
+    }
+});
