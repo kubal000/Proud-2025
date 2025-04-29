@@ -36,7 +36,7 @@ def tabulka(tym, pole, cislo):
     return str(df.loc[tym, pole])
 
 def ulozeni(sid, suma):
-    konec = time.time() + 10
+    konec = time.time() + 2 * 60
     idb = time.time()
     while True:
         zbyva = int(konec - time.time())

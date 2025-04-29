@@ -95,6 +95,7 @@ socket.on('banka', (data) => {
     if (!dluh) {
         dluh = document.createElement("li");
         dluh.id = data.idb;
+        banka.appendChild(dluh);
     }
     dluh.textContent = "Uloženo: " + data.suma + "$, ještě: " + data.cas;
     if (data.cas === '00:00:00') {
