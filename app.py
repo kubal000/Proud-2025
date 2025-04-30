@@ -11,12 +11,33 @@ socketio = SocketIO(app, async_mode='eventlet')
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
 
+def ZpravaVsem(zprava, emit):
+    for username, sid in usernames.items():
+        socketio.emit(emit, {'zprava': zprava}, to=sid)
+
+def NulujTabulku(tym): # nefunguje nulování, dodělat, ozkoušet TODO
+    df = pd.read_csv("tymy.csv")
+
+    if tym:
+        # Nechá jen záhlaví (první řádek = sloupce)
+        df.iloc[0:0].to_csv("tymy.csv", index=False)
+    else:
+        # Zachová celý první řádek a první sloupec, ostatní hodnoty nastaví na 0
+        for r in range(1, len(df.index)):
+            for c in range(1, len(df.columns)):
+                df.iat[r, c] = 0
+        df.to_csv("tymy.csv", index=False)
+        
+
 def casovac(sid, cas):
+    NulujTabulku(False)
+    ZpravaVsem('Hra zacina', 'hra')
     konec = time.time() + cas
     while True:
         zbyva = int(konec - time.time())
         if zbyva <= 0:
             socketio.emit('casovac', {'cas': '00:00:00'}, to=sid)
+            ZpravaVsem('Hra konci', 'hra')
             break
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
@@ -44,7 +65,7 @@ def tabulka(tym, pole, cislo):
     return str(df.loc[tym, pole])
 
 def ulozeni(sid, suma):
-    konec = time.time() + 2 * 60
+    konec = time.time() + 0.5 * 60
     idb = time.time()
     while True:
         zbyva = int(konec - time.time())

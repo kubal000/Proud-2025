@@ -30,7 +30,7 @@ function Uloz() {
 }
 
 function StartTimer() {
-    socket.emit('start_timer', {'cas': 60});
+    socket.emit('start_timer', {'cas': 60 * 2});
     document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
 }
 
@@ -134,3 +134,30 @@ socket.on('tabulka', function (data) {
 
     document.body.appendChild(table);
 });
+
+socket.on('hra', function (data) {
+    
+    const stav = data.zprava;
+    const prvky = document.querySelectorAll('.hra')
+    const prvkynone = document.querySelectorAll('.hranone')
+    if (stav === 'Hra zacina') {
+        socket.emit('init')
+        prvky.forEach(el => {
+            alert('baf')
+            el.style.display = 'block';
+        })
+        document.querySelector('.staty').style.display = 'flex';
+        prvkynone.forEach(el => {
+            alert('bafnone')
+            el.style.display = 'none';
+        })
+    }
+    if (stav === 'Hra konci') {
+        prvky.forEach(el => {
+            el.style.display = 'none';
+        })
+        prvkynone.forEach(el => {
+            el.style.display = 'block';
+        })
+    }
+})

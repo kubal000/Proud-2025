@@ -39,4 +39,10 @@ body {
 ul {
   list-style-type: none;
 }
+.hra {
+    display: none;
+}
+.hranone {
+    display: block;
+}
 

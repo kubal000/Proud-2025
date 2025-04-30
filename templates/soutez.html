@@ -9,7 +9,7 @@
 </head>
 <body onload="Init()">
     <h1 class="nadpis">Herní pole pro tým: {{ username }}</h1>
-    <div class="staty">
+    <div class="staty hra">
         <div><div>Peníze:</div><div id='penize'>error</div></div>
         <div>
             Formule A:
@@ -48,11 +48,11 @@
             </div>
         </div>
     </div>
-    <div class="ulohy bloky">
+    <div class="ulohy bloky hra">
         <h3>Odevzádní úlohy</h3>
         <button onclick="Uloha()">Odevzdat další</button>
     </div>
-    <div class="banka bloky">
+    <div class="banka bloky hra">
         <h3>Banka</h3>
         <p>Peníze zůstanou uložené 20 min, pak se vrátí 110% vložené částky.</p>
         <div>
@@ -62,7 +62,8 @@
         </div>
         <ul id="dluhy"></ul>
     </div>
-    <div class="zavody bloky"> Zavody</div>
+    <div class="zavody bloky hra"> Zavody</div>
+    <h2 class="hranone">Zde se zobrazí herní prvky...</h2>
     <div class="komunikace">
         <h2>Zprávy</h2>
         <p>Zde si můžeš popovídat s člověkem u hlavního počítače.</p>
