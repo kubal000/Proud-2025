@@ -30,7 +30,7 @@ function Uloz() {
 }
 
 function StartTimer() {
-    socket.emit('start_timer', {'cas': 60 * 2});
+    socket.emit('start_timer', {'cas': 90});
     document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
 }
 
@@ -143,12 +143,10 @@ socket.on('hra', function (data) {
     if (stav === 'Hra zacina') {
         socket.emit('init')
         prvky.forEach(el => {
-            alert('baf')
             el.style.display = 'block';
         })
         document.querySelector('.staty').style.display = 'flex';
         prvkynone.forEach(el => {
-            alert('bafnone')
             el.style.display = 'none';
         })
     }

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
 import time
+import copy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
@@ -11,30 +12,53 @@ socketio = SocketIO(app, async_mode='eventlet')
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
 
+a = [
+    ['Monako', 80], ['Velká Británie', 76.5], ['Itálie', 73], ['Japonsko', 69.5], ['Saudská Arábie', 66], ['Belgie', 62.5], 
+    ['Itálie', 59], ['Monako', 55.5], ['Japonsko', 52], ['Belgie', 48.5], ['Monako', 45], ['Velká Británie', 41.5], 
+    ['Saudská Arábie', 38], ['Velká Británie', 34.5], ['Itálie', 31], ['Belgie', 27.5], ['Japonsko', 24], ['Saudská Arábie', 20.5], 
+    ['Monako', 17], ['Belgie', 13.5], ['Itálie', 10], ['Velká Británie', 6.5], ['Japonsko', 3], ['Belgie', 0], 
+    ['Japonsko', 0], ['Monako', 0], ['Saudská Arábie', 0], ['Velká Británie', 0], ['Itálie', 0]
+]
+b = [
+    80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
+]
+
+min = 2 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
         socketio.emit(emit, {'zprava': zprava}, to=sid)
 
-def NulujTabulku(tym): # nefunguje nulování, dodělat, ozkoušet TODO
+def NulujTabulku():
     df = pd.read_csv("tymy.csv")
+    # Nechá jen záhlaví (první řádek = sloupce)
+    df.iloc[0:0].to_csv("tymy.csv", index=False)
 
-    if tym:
-        # Nechá jen záhlaví (první řádek = sloupce)
-        df.iloc[0:0].to_csv("tymy.csv", index=False)
-    else:
-        # Zachová celý první řádek a první sloupec, ostatní hodnoty nastaví na 0
-        for r in range(1, len(df.index)):
-            for c in range(1, len(df.columns)):
-                df.iat[r, c] = 0
-        df.to_csv("tymy.csv", index=False)
-        
+def ZahajZavod(trasa, start):
+    # Sem je třeba doplnit kód pro průběh závodu TODO
+    d="d"
+
+def ZavodNalezeni(cislo, data):
+    for zavod in data[:]:
+        if zavod[1] == cislo:
+            trasa = zavod[0]
+            data.pop(data.index(zavod))
+            socketio.start_background_task(ZahajZavod, trasa, cislo)
+    return data
 
 def casovac(sid, cas):
-    NulujTabulku(False)
+    NulujTabulku()
+    data = copy.deepcopy(a)
+    casy = copy.deepcopy(b)
     ZpravaVsem('Hra zacina', 'hra')
     konec = time.time() + cas
     while True:
         zbyva = int(konec - time.time())
+        for cislo in casy[:]:
+            if cislo >= zbyva/min-10:
+                casy.pop(casy.index(cislo))
+                data = ZavodNalezeni(cislo, data)
+                break
         if zbyva <= 0:
             socketio.emit('casovac', {'cas': '00:00:00'}, to=sid)
             ZpravaVsem('Hra konci', 'hra')
@@ -43,7 +67,7 @@ def casovac(sid, cas):
         m = (zbyva % 3600) // 60
         s = zbyva % 60
         socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=sid)
-        socketio.sleep(1)
+        socketio.sleep(1 - (time.time() % 1))
 
 def tabulka(tym, pole, cislo):
     df = pd.read_csv("tymy.csv")
@@ -65,7 +89,7 @@ def tabulka(tym, pole, cislo):
     return str(df.loc[tym, pole])
 
 def ulozeni(sid, suma):
-    konec = time.time() + 0.5 * 60
+    konec = time.time() + 20 * min
     idb = time.time()
     while True:
         zbyva = int(konec - time.time())
@@ -195,7 +219,7 @@ def Uloz(data):
 
 @socketio.on('start_timer')
 def start_timer(data):
-    socketio.start_background_task(casovac, request.sid, data['cas'])
+    socketio.start_background_task(casovac, request.sid, data['cas'] * min)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)
