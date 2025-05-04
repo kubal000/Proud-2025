@@ -36,7 +36,7 @@ def NulujTabulku():
 
 def ZahajZavod(trasa, start):
     # Sem je třeba doplnit kód pro průběh závodu TODO
-    d="d"
+    print(f'Závod {trasa} začíná za 10 min v čase: {start}')
 
 def ZavodNalezeni(cislo, data):
     for zavod in data[:]:
