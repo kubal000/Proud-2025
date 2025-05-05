@@ -1,8 +1,12 @@
+#from curses.ascii import SO
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
 import time
 import copy
+
+#TODO: vyřešit opětovné připojení uživatele během hry (výpadky...)
+#TODO: vyhodnocování závodu
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
@@ -34,16 +38,45 @@ def NulujTabulku():
     # Nechá jen záhlaví (první řádek = sloupce)
     df.iloc[0:0].to_csv("tymy.csv", index=False)
 
-def ZahajZavod(trasa, start):
-    # Sem je třeba doplnit kód pro průběh závodu TODO
+def ZahajZavod(trasa, start, konechry): # konechry - reálný čas konce hry v sekundách, start - čas startu závodu v minutách zbývajících do konce hry
     print(f'Závod {trasa} začíná za 10 min v čase: {start}')
+    df = pd.read_csv("zavody.csv", encoding='utf-8')
+    df.set_index('stat', inplace=True)
+    jizda = int(df.loc[trasa, 'cas']) # čas jízdy v minutách
+    motor = int(df.loc[trasa, 'motor'])
+    brzda = int(df.loc[trasa, 'brzda'])
+    delka = int(df.loc[trasa, 'delka']) # délka trasy v km
+    Zacatek = konechry - start * min 
+    while Zacatek > time.time():
+        zbyva = Zacatek - time.time()
+        h = zbyva // 3600
+        m = (zbyva % 3600) // 60
+        s = zbyva % 60
+        for username, sid in usernames.items():
+            socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'delka': delka, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+        socketio.sleep(1 - (time.time() % 1))
+    for username, sid in usernames.items():
+        socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
+    for prubeh in range(jizda*min):
+        zbyva = jizda*min - prubeh
+        h = zbyva // 3600
+        m = (zbyva % 3600) // 60
+        s = zbyva % 60
+        for username, sid in usernames.items(): #TODO: posílat jen závodníkům
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'delka': delka, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+        socketio.sleep(1 - (time.time() % 1))
+    for username, sid in usernames.items(): # -//-
+        socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
+    # vyhodnocení a odeslání výsledků TODO
 
-def ZavodNalezeni(cislo, data):
+
+
+def ZavodNalezeni(cislo, data, konechry):
     for zavod in data[:]:
         if zavod[1] == cislo:
             trasa = zavod[0]
             data.pop(data.index(zavod))
-            socketio.start_background_task(ZahajZavod, trasa, cislo)
+            socketio.start_background_task(ZahajZavod, trasa, cislo, konechry)
     return data
 
 def casovac(sid, cas):
@@ -57,7 +90,7 @@ def casovac(sid, cas):
         for cislo in casy[:]:
             if cislo >= zbyva/min-10:
                 casy.pop(casy.index(cislo))
-                data = ZavodNalezeni(cislo, data)
+                data = ZavodNalezeni(cislo, data, konec)
                 break
         if zbyva <= 0:
             socketio.emit('casovac', {'cas': '00:00:00'}, to=sid)

@@ -1,10 +1,5 @@
 function sendMessage() {
-    const elem = document.getElementById("target_user");
-    if (elem.tagName === "INPUT") {
-        targetUser = elem.value;
-    } else {
-        targetUser = elem.textContent;
-    }
+    targetUser = document.getElementById("target_user").textContent;
     const message = document.getElementById("message").value;
 
     socket.emit('send_message', {
@@ -17,6 +12,10 @@ function Uloha() {
     socket.emit('uloha');
 }
 
+function Prihlas() {
+    alert("Přihlásil jsi se do závodu. Doprogramovat");
+}
+
 function Zvedni(faktor) {
     socket.emit('zvedni', { 'faktor': faktor });
 }
@@ -27,11 +26,6 @@ function Init() {
 
 function Uloz() {  
     socket.emit('uloz', { 'suma': document.getElementById('ulozeni').value});
-}
-
-function StartTimer() {
-    socket.emit('start_timer', {'cas': 90});
-    document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
 }
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
@@ -81,14 +75,6 @@ socket.on('receive_message', function (data) {
     messages.appendChild(messageItem);
 });
 
-socket.on('casovac', (data) => {
-    document.getElementById("casovac").textContent = data.cas
-    if (data.cas === '00:00:00') {
-        document.getElementById("casovac").textContent = "Čas vypršel"
-        document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
-    }
-});
-
 socket.on('banka', (data) => {
     const banka = document.getElementById("dluhy");
     let dluh = document.getElementById(data.idb);
@@ -103,37 +89,52 @@ socket.on('banka', (data) => {
     }
 });
 
-socket.on('tabulka', function (data) {
-    const table = document.getElementById("tabulka");
-    const body = table.querySelector("tbody");
-    const head = table.querySelector("thead");
-    if (body) {
-        body.remove();
+socket.on('zavod', (data) => {
+    let idz = data.trasa + data.start
+    if (data.stav === 'prihlasovani') {
+        const kategorie = document.getElementById('prihlasovani')
+        let zavod = document.getElementById(idz);
+        if (!zavod) {
+            zavod = document.createElement("li");
+            zavod.id = idz;
+            kategorie.appendChild(zavod);
+            let text = document.createElement('label')
+            text.id = idz + 'label'
+            text.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, začíná za: " + data.cas
+            zavod.appendChild(text);
+            let button = document.createElement('button')
+            button.textContent = "Přihlásit se."
+            button.onclick = () => Prihlas()
+            zavod.appendChild(button);
+        }
+        else {
+            let text = document.getElementById(idz + 'label')
+            text.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, začíná za: " + data.cas
+        }
+    } else if (data.stav === 'start') {
+        let zavod = document.getElementById(idz);
+        zavod.remove()
+    } else if (data.stav === 'jizda') {
+        idz = idz + 'j'
+        const kategorie = document.getElementById('jizda')
+        let zavod = document.getElementById(idz);
+        if (!zavod) {
+            zavod = document.createElement("li");
+            zavod.id = idz;
+            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, poběží ještě: " + data.cas
+            kategorie.appendChild(zavod);
+        }
+        else {
+            let zavod = document.getElementById(idz)
+            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, poběží ještě: " + data.cas
+        }
+    } else if (data.stav === 'cil') {
+        idz = idz + 'j'
+        let zavod = document.getElementById(idz);
+        zavod.remove()
     }
-    if (head) {
-        head.remove();
-    }
-    
-    const thead = table.createTHead();
-    const headerRow = thead.insertRow();
-    
+})
 
-    data.columns.forEach(col => {
-        const th = document.createElement("th");
-        th.textContent = col;
-        headerRow.appendChild(th);
-    });
-    const tbody = table.createTBody();
-    data.rows.forEach(row => {
-        const tr = tbody.insertRow();
-        data.columns.forEach(col => {
-            const td = tr.insertCell();
-            td.textContent = row[col];
-        });
-    });
-
-    document.body.appendChild(table);
-});
 
 socket.on('hra', function (data) {
     
