@@ -17,17 +17,17 @@ usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
 
 a = [
-    ['Monako', 80], ['Velká Británie', 76.5], ['Itálie', 73], ['Japonsko', 69.5], ['Saudská Arábie', 66], ['Belgie', 62.5], 
-    ['Itálie', 59], ['Monako', 55.5], ['Japonsko', 52], ['Belgie', 48.5], ['Monako', 45], ['Velká Británie', 41.5], 
-    ['Saudská Arábie', 38], ['Velká Británie', 34.5], ['Itálie', 31], ['Belgie', 27.5], ['Japonsko', 24], ['Saudská Arábie', 20.5], 
-    ['Monako', 17], ['Belgie', 13.5], ['Itálie', 10], ['Velká Británie', 6.5], ['Japonsko', 3], ['Belgie', 0], 
-    ['Japonsko', 0], ['Monako', 0], ['Saudská Arábie', 0], ['Velká Británie', 0], ['Itálie', 0]
+    ['Monako', 80, []], ['Velká Británie', 76.5, []], ['Itálie', 73, []], ['Japonsko', 69.5, []], ['Saudská Arábie', 66, []], ['Belgie', 62.5, []], 
+    ['Itálie', 59, []], ['Monako', 55.5, []], ['Japonsko', 52, []], ['Belgie', 48.5, []], ['Monako', 45, []], ['Velká Británie', 41.5, []], 
+    ['Saudská Arábie', 38, []], ['Velká Británie', 34.5, []], ['Itálie', 31, []], ['Belgie', 27.5, []], ['Japonsko', 24, []], ['Saudská Arábie', 20.5, []], 
+    ['Monako', 17, []], ['Belgie', 13.5, []], ['Itálie', 10, []], ['Velká Británie', 6.5, []], ['Japonsko', 3, []], ['Belgie', 0, []], 
+    ['Japonsko', 0, []], ['Monako', 0, []], ['Saudská Arábie', 0, []], ['Velká Británie', 0, []], ['Itálie', 0, []]
 ]
 b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 2 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 3 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -38,14 +38,13 @@ def NulujTabulku():
     # Nechá jen záhlaví (první řádek = sloupce)
     df.iloc[0:0].to_csv("tymy.csv", index=False)
 
-def ZahajZavod(trasa, start, konechry): # konechry - reálný čas konce hry v sekundách, start - čas startu závodu v minutách zbývajících do konce hry
+def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce hry v sekundách, start - čas startu závodu v minutách zbývajících do konce hry
     print(f'Závod {trasa} začíná za 10 min v čase: {start}')
     df = pd.read_csv("zavody.csv", encoding='utf-8')
     df.set_index('stat', inplace=True)
     jizda = int(df.loc[trasa, 'cas']) # čas jízdy v minutách
     motor = int(df.loc[trasa, 'motor'])
     brzda = int(df.loc[trasa, 'brzda'])
-    delka = int(df.loc[trasa, 'delka']) # délka trasy v km
     Zacatek = konechry - start * min 
     while Zacatek > time.time():
         zbyva = Zacatek - time.time()
@@ -53,21 +52,36 @@ def ZahajZavod(trasa, start, konechry): # konechry - reálný čas konce hry v s
         m = (zbyva % 3600) // 60
         s = zbyva % 60
         for username, sid in usernames.items():
-            socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'delka': delka, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+            if [username, "A"] in a[index][2] or [username, 'B'] in a[index][2]:
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+            else:
+                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
         socketio.sleep(1 - (time.time() % 1))
     for username, sid in usernames.items():
         socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
+    dftymy = pd.read_csv("tymy.csv", encoding='utf-8')
+    dftymy.set_index('tym', inplace=True)
+    dataoformulich = {} # tym → [formule, motor, brzda]
+
+    for zavodnik in a[index][2]:
+        if zavodnik[0] in dftymy.index:
+            formule = zavodnik[1]
+            zmotor = int(dftymy.loc[zavodnik[0], f'{formule}_motor'])
+            zbrzda = int(dftymy.loc[zavodnik[0], f'{formule}_brzda'])
+            dataoformulich[zavodnik[0]] = [formule, zmotor, zbrzda]
     for prubeh in range(jizda*min):
         zbyva = jizda*min - prubeh
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
         s = zbyva % 60
-        for username, sid in usernames.items(): #TODO: posílat jen závodníkům
-            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'delka': delka, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+        for zavodnik in a[index][2]:
+            sid = usernames.get(zavodnik[0])
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, }, to=sid)
         socketio.sleep(1 - (time.time() % 1))
-    for username, sid in usernames.items(): # -//-
+    for zavodnik in a[index][2]:
+        sid = usernames.get(zavodnik[0])
         socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
-    # vyhodnocení a odeslání výsledků TODO
+    #TODO: vyhodnocení a odeslání výsledků 
 
 
 
@@ -76,11 +90,17 @@ def ZavodNalezeni(cislo, data, konechry):
         if zavod[1] == cislo:
             trasa = zavod[0]
             data.pop(data.index(zavod))
-            socketio.start_background_task(ZahajZavod, trasa, cislo, konechry)
+            for i in range(len(a)):
+                if a[i][0] == trasa and a[i][1] == cislo:
+                    index = i
+            socketio.start_background_task(ZahajZavod, trasa, cislo, konechry, index)
     return data
 
 def casovac(sid, cas):
     NulujTabulku()
+    global a
+    for i in range(len(a)):
+        a[i][2] = []
     data = copy.deepcopy(a)
     casy = copy.deepcopy(b)
     ZpravaVsem('Hra zacina', 'hra')
@@ -247,6 +267,37 @@ def Uloz(data):
     else:
         emit('penize', {'penize': penize})
         socketio.start_background_task(ulozeni, request.sid, suma)
+
+#   ZAVODU
+
+@socketio.on('prihlaszavod')
+def prihlaszavod(data):
+    tym = sid_to_username.get(request.sid)
+    trasa = data['trasa']
+    start = float(data['start'])
+    formule = data['formule']
+    df = pd.read_csv("zavody.csv", encoding='utf-8')
+    df.set_index('stat', inplace=True)
+    cas = int(df.loc[trasa, 'cas']) # čas jízdy v minutách
+    global a
+    for i in range(len(a)):
+        if a[i][0]== trasa and a[i][1] == start:
+            if [tym,formule] not in a[i][2]:
+                s = True
+                for j in range(len(a)):
+                    if not(start + cas < a[j][1] or start > a[j][1] + df.loc[a[j][0], 'cas']) and [tym,formule] in a[j][2]:
+                        s = False
+                        break
+                if s:
+                    a[i][2].append([tym,formule])
+                    emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start})
+                    emit('chyba', {'zprava': f'Úspěšně přihlášeno do závodu! {trasa}, {cas}'})
+                else:
+                    emit('chyba', {'zprava': 'Závod se překrývá s jiným závodem ve kterém máš formuli!'})
+            else:
+                emit('chyba', {'zprava': 'Již přihlášeno do závodu!'})
+            index = i
+            break
 
 #   CASOMIRY
 

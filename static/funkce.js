@@ -12,8 +12,8 @@ function Uloha() {
     socket.emit('uloha');
 }
 
-function Prihlas() {
-    alert("Přihlásil jsi se do závodu. Doprogramovat");
+function Prihlas(trasa, start, formule) {
+    socket.emit('prihlaszavod', { 'trasa': trasa, 'start': start, 'formule':formule})
 }
 
 function Zvedni(faktor) {
@@ -102,14 +102,30 @@ socket.on('zavod', (data) => {
             text.id = idz + 'label'
             text.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, začíná za: " + data.cas
             zavod.appendChild(text);
-            let button = document.createElement('button')
-            button.textContent = "Přihlásit se."
-            button.onclick = () => Prihlas()
-            zavod.appendChild(button);
+            let buttonA = document.createElement('button')
+            buttonA.textContent = "Přihlásit formuli A."
+            buttonA.onclick = () => Prihlas(data.trasa, data.start, "A")
+            zavod.appendChild(buttonA);
+            let buttonB = document.createElement('button')
+            buttonB.textContent = "Přihlásit formuli B."
+            buttonB.onclick = () => Prihlas(data.trasa, data.start, "B")
+            zavod.appendChild(buttonB);
         }
         else {
             let text = document.getElementById(idz + 'label')
             text.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, začíná za: " + data.cas
+        }
+    } else if (data.stav === 'prihlaseno') {
+        let zavod = document.getElementById(idz);
+        if (!zavod) {
+            const kategorie = document.getElementById('prihlaseno')
+            zavod = document.createElement("li");
+            zavod.id = idz;
+            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, začíná za: " + data.cas
+            kategorie.appendChild(zavod);
+        }
+        else {
+            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, začíná za: " + data.cas
         }
     } else if (data.stav === 'start') {
         let zavod = document.getElementById(idz);
