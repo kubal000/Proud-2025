@@ -46,10 +46,13 @@ socket.on('receive_message', function (data) {
 });
 
 socket.on('casovac', (data) => {
+    button = document.getElementById("casovacb");
     document.getElementById("casovac").textContent = data.cas
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel"
-        document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
+        button.style.display = "block"; // Zobraz tlačítko pro spuštění časovače
+    } else if (button.style.display !== 'none'){
+        button.style.display = 'none'
     }
 });
 
@@ -85,27 +88,3 @@ socket.on('tabulka', function (data) {
     document.body.appendChild(table);
 });
 
-socket.on('hra', function (data) {
-    
-    const stav = data.zprava;
-    const prvky = document.querySelectorAll('.hra')
-    const prvkynone = document.querySelectorAll('.hranone')
-    if (stav === 'Hra zacina') {
-        socket.emit('init')
-        prvky.forEach(el => {
-            el.style.display = 'block';
-        })
-        document.querySelector('.staty').style.display = 'flex';
-        prvkynone.forEach(el => {
-            el.style.display = 'none';
-        })
-    }
-    if (stav === 'Hra konci') {
-        prvky.forEach(el => {
-            el.style.display = 'none';
-        })
-        prvkynone.forEach(el => {
-            el.style.display = 'block';
-        })
-    }
-})

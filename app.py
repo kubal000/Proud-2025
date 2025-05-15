@@ -1,4 +1,3 @@
-#from curses.ascii import SO
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
@@ -15,6 +14,8 @@ socketio = SocketIO(app, async_mode='eventlet')
 # Pamatujeme si přihlášené uživatele a jejich připojení
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
+
+herni_stav = "nebezi"
 
 a = [
     ['Monako', 80, []], ['Velká Británie', 76.5, []], ['Itálie', 73, []], ['Japonsko', 69.5, []], ['Saudská Arábie', 66, []], ['Belgie', 62.5, []], 
@@ -37,6 +38,7 @@ def NulujTabulku():
     df = pd.read_csv("tymy.csv")
     # Nechá jen záhlaví (první řádek = sloupce)
     df.iloc[0:0].to_csv("tymy.csv", index=False)
+    PosliTabulkuEditorovi()
 
 def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce hry v sekundách, start - čas startu závodu v minutách zbývajících do konce hry
     print(f'Závod {trasa} začíná za 10 min v čase: {start}')
@@ -96,14 +98,16 @@ def ZavodNalezeni(cislo, data, konechry):
             socketio.start_background_task(ZahajZavod, trasa, cislo, konechry, index)
     return data
 
-def casovac(sid, cas):
+def casovac(tym, cas):
     NulujTabulku()
+    global herni_stav
     global a
     for i in range(len(a)):
         a[i][2] = []
     data = copy.deepcopy(a)
     casy = copy.deepcopy(b)
     ZpravaVsem('Hra zacina', 'hra')
+    herni_stav = 'bezi'
     konec = time.time() + cas
     while True:
         zbyva = int(konec - time.time())
@@ -113,31 +117,33 @@ def casovac(sid, cas):
                 data = ZavodNalezeni(cislo, data, konec)
                 break
         if zbyva <= 0:
-            socketio.emit('casovac', {'cas': '00:00:00'}, to=sid)
+            socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get(tym))
             ZpravaVsem('Hra konci', 'hra')
+            herni_stav = 'nebezi'
             break
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
         s = zbyva % 60
-        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=sid)
+        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=usernames.get(tym))
         socketio.sleep(1 - (time.time() % 1))
+
+def PosliTabulkuEditorovi():
+    Editor = usernames.get('Editor')
+    if Editor:
+        df = pd.read_csv("tymy.csv")
+        columns = ['tym'] + [col for col in df.columns if col != 'tym']
+        data = df[columns].to_dict(orient='records')
+        
+        socketio.emit('tabulka', {'columns': columns, 'rows': data}, to=Editor)
 
 def tabulka(tym, pole, cislo):
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
     df.loc[tym, pole] = int(df.loc[tym, pole]) + cislo
     if df.loc[tym, pole]<0:
-        df.loc[tym, pole] = int(df.loc[tym, pole]) - cislo
-        df.to_csv('tymy.csv', index=True)
         return False
     df.to_csv('tymy.csv', index=True)
-    Editor = usernames.get('Editor')
-    if Editor:
-        df['tym'] = df.index
-        columns = ['tym'] + [col for col in df.columns if col != 'tym']
-        data = df[columns].to_dict(orient='records')
-        
-        socketio.emit('tabulka', {'columns': columns, 'rows': data}, to=Editor)
+    PosliTabulkuEditorovi()
     
     return str(df.loc[tym, pole])
 
@@ -170,7 +176,7 @@ def index():
 def login():
     username = request.args.get('username')
     heslo = request.args.get('heslo')
-    if heslo == 'Proud2025':
+    if heslo == 'Proud2025' and username != 'Editor':
         return redirect(url_for('soutez', username=username))
     elif heslo == 'Proud2025e' and username == 'Editor':
         return redirect(url_for('editor', username=username))
@@ -202,10 +208,11 @@ def init():
     emit('penize', {'penize': str(df.loc[tym, 'penize'])})
     for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
         emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(25*(df.loc[tym, faktor]+2))})
+    PosliTabulkuEditorovi()
 
-@socketio.on('connect')
-def handle_connect():
-    print('Uživatel připojen:', request.sid)
+#@socketio.on('connect') # automaticky zavoláno při připojení - pokud nereaguji, není třeba mít.
+#def handle_connect():
+    #print('Připojen:', request.sid)
 
 @socketio.on('register_username')
 def handle_register_username(data):
@@ -215,6 +222,9 @@ def handle_register_username(data):
         sid_to_username[request.sid] = username
         print(f'{username} přihlášen jako {request.sid}')
         update_online_users()
+        df = pd.read_csv("tymy.csv")
+        if herni_stav == 'bezi' and username in df['tym'].values:
+            emit('hra', {'zprava':'Hra zacina'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -222,7 +232,7 @@ def handle_disconnect():
     username = sid_to_username.pop(sid, None)
     if username and username in usernames:
         del usernames[username]
-        print('Odpojeno:', sid)
+        print('Odpojeno:', sid, "tedy:", username)
         update_online_users()
 
 # AKCE
@@ -303,7 +313,7 @@ def prihlaszavod(data):
 
 @socketio.on('start_timer')
 def start_timer(data):
-    socketio.start_background_task(casovac, request.sid, data['cas'] * min)
+    socketio.start_background_task(casovac, sid_to_username.get(request.sid), data['cas'] * min)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)
