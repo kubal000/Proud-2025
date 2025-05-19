@@ -4,7 +4,6 @@ import pandas as pd
 import time
 import copy
 
-#TODO: vyřešit opětovné připojení uživatele během hry (výpadky...)
 #TODO: vyhodnocování závodu
 
 app = Flask(__name__)
@@ -83,7 +82,19 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
     for zavodnik in a[index][2]:
         sid = usernames.get(zavodnik[0])
         socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
-    #TODO: vyhodnocení a odeslání výsledků 
+    seznamkrazeni = []
+    for tym in dataoformulich.keys():
+        info = dataoformulich[tym]
+        seznamkrazeni.append([tym, info[0], info[1]*motor+info[2]*brzda])
+    seznamkrazeni = sorted(seznamkrazeni, key=lambda x: x[2])
+    serazeno = []
+    while len(seznamkrazeni) > 0:
+        prvek = [seznamkrazeni.pop()]
+        while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
+                prvek.append(seznamkrazeni.pop())
+        serazeno.append(prvek)
+    #stav = seřazeno, je třeba rozdělit body a odeslat, jak vypadá výstup je vidět v kódu pokus.py v VS Code na malém počítači
+        #TODO: vyhodnocení a odeslání výsledků 
 
 
 
