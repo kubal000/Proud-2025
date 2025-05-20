@@ -27,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 3 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 10 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -158,20 +158,7 @@ def tabulka(tym, pole, cislo):
     
     return str(df.loc[tym, pole])
 
-def ulozeni(sid, suma):
-    konec = time.time() + 20 * min
-    idb = time.time()
-    while True:
-        zbyva = int(konec - time.time())
-        if zbyva <= 0:
-            socketio.emit('banka', {'cas': '00:00:00', 'idb': idb, 'suma': suma}, to=sid)
-            socketio.emit('penize', {'penize': tabulka(sid_to_username.get(sid), 'penize', int(suma*1.1))}, to=sid)
-            break
-        h = zbyva // 3600
-        m = (zbyva % 3600) // 60
-        s = zbyva % 60
-        socketio.emit('banka', {'cas': f'{h:02d}:{m:02d}:{s:02d}', 'idb': idb, 'suma': suma}, to=sid)
-        socketio.sleep(1)
+
 
 def update_online_users():
     emit('online_users', list(usernames.keys()), broadcast=True)
@@ -279,15 +266,7 @@ def zvedni(data):
         emit('penize', {'penize': penize})
         emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
 
-@socketio.on('uloz')
-def Uloz(data):
-    suma = int(data['suma'])
-    penize = tabulka(sid_to_username.get(request.sid), 'penize', -suma)
-    if penize == False:
-        emit('chyba', {'zprava': 'Nemůžeš uložit peníze které nemáš!!!'})
-    else:
-        emit('penize', {'penize': penize})
-        socketio.start_background_task(ulozeni, request.sid, suma)
+
 
 #   ZAVODU
 

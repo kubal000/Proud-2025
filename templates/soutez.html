@@ -9,60 +9,50 @@
 </head>
 <body onload="Init()">
     <h1 class="nadpis">Herní pole pro tým: {{ username }}</h1>
-    <div class="staty hra">
-        <div><div>Peníze:</div><div id='penize'>error</div></div>
+    <div class="staty hra okenko">
+        <div><h5>Peníze:</h5><div id='penize'>error</div></div>
         <div>
-            Formule A:
+            <h5>Formule A:</h5>
             <div style="display:flex;flex-direction:column">
-                <div style="display:flex;flex-direction:row">
+                <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Motor: <span id="A_motor">error</span>
                     </div>
-                    <button onclick="Zvedni('A_motor')" id="A_motorb">error</button>
+                    <button onclick="Zvedni('A_motor')" id="A_motorb" class="faktorbutton">error</button>
                 </div>
-                <div style="display:flex;flex-direction:row">
+                <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Brzda: <span id="A_brzda">error</span>
                     </div>    
-                    <button onclick="Zvedni('A_brzda')" id="A_brzdab">error</button>
+                    <button onclick="Zvedni('A_brzda')" id="A_brzdab" class="faktorbutton">error</button>
                 </div>
             </div>
         </div>
         <div>
-            Formule B:
+            <h5>Formule B:</h5>
             <div style="display:flex;flex-direction:column">
-                <div style="display:flex;flex-direction:row">
+                <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Motor: <span id="B_motor">error</span>
                     </div>
                     
-                    <button onclick="Zvedni('B_motor')" id="B_motorb">error</button>
+                    <button onclick="Zvedni('B_motor')" id="B_motorb" class="faktorbutton">error</button>
                 </div>
-                <div style="display:flex;flex-direction:row">
+                <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Brzda: <span id="B_brzda">error</span>
                     </div>
                     
-                    <button onclick="Zvedni('B_brzda')" id="B_brzdab">error</button>
+                    <button onclick="Zvedni('B_brzda')" id="B_brzdab" class="faktorbutton">error</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="ulohy bloky hra">
+    <div class="ulohy bloky hra okenko">
         <h3>Odevzdání úlohy</h3>
         <button onclick="Uloha()">Odevzdat další</button>
     </div>
-    <div class="banka bloky hra">
-        <h3>Banka (Smažu po odevzdání jako práce na IVT)</h3>
-        <p>Peníze zůstanou uložené 20 min, pak se vrátí 110% vložené částky.</p>
-        <div>
-            <label for="ulozeni">Kolik si chceš uložit peněz?</label>
-            <input type="number" id="ulozeni"/>
-            <button onclick="Uloz()">Uložit</button>
-        </div>
-        <ul id="dluhy"></ul>
-    </div>
-    <div class="zavody bloky hra">
+    <div class="zavody bloky hra okenko">
         <h3>Zavody</h3>
         <h4>K příhlášení:</h4>
         <ul id="prihlasovani"></ul>
@@ -73,8 +63,8 @@
         <h4>Proběhlé:</h4>
         <ul id="probehle"></ul>
     </div>
-    <h2 class="hranone">Zde se zobrazí herní prvky...</h2>
-    <div class="komunikace">
+    <h2 class="hranone okenko">Zde se zobrazí herní prvky...</h2>
+    <div class="komunikace okenko">
         <h2>Zprávy</h2>
         <p>Zde si můžeš popovídat s člověkem u hlavního počítače.</p>
         <label>Příjemce: <span id="target_user">Editor</span></label>

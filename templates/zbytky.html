@@ -1,0 +1,58 @@
+
+<div class="banka bloky hra">
+    <h3>Banka (Smažu)</h3>
+    <p>Peníze zùstanou uložené 20 min, pak se vrátí 110% vložené èástky.</p>
+    <div>
+        <label for="ulozeni">Kolik si chceš uložit penìz?</label>
+        <input type="number" id="ulozeni" />
+        <button onclick="Uloz()">Uložit</button>
+    </div>
+    <ul id="dluhy"></ul>
+</div>
+
+
+function Uloz() {
+    socket.emit('uloz', { 'suma': document.getElementById('ulozeni').value});
+}
+
+socket.on('banka', (data) => {
+    const banka = document.getElementById("dluhy");
+    let dluh = document.getElementById(data.idb);
+    if (!dluh) {
+        dluh = document.createElement("li");
+        dluh.id = data.idb;
+        banka.appendChild(dluh);
+    }
+    dluh.textContent = "Uloženo: " + data.suma + "$, ještì: " + data.cas;
+    if (data.cas === '00:00:00') {
+        dluh.remove()
+    }
+});
+
+
+
+def ulozeni(sid, suma):
+    konec = time.time() + 20 * min
+    idb = time.time()
+    while True:
+        zbyva = int(konec - time.time())
+        if zbyva <= 0:
+            socketio.emit('banka', {'cas': '00:00:00', 'idb': idb, 'suma': suma}, to=sid)
+            socketio.emit('penize', {'penize': tabulka(sid_to_username.get(sid), 'penize', int(suma*1.1))}, to=sid)
+            break
+        h = zbyva // 3600
+        m = (zbyva % 3600) // 60
+        s = zbyva % 60
+        socketio.emit('banka', {'cas': f'{h:02d}:{m:02d}:{s:02d}', 'idb': idb, 'suma': suma}, to=sid)
+        socketio.sleep(1)
+
+
+@socketio.on('uloz')
+def Uloz(data):
+    suma = int(data['suma'])
+    penize = tabulka(sid_to_username.get(request.sid), 'penize', -suma)
+    if penize == False:
+        emit('chyba', {'zprava': 'Nemùžeš uložit peníze které nemáš!!!'})
+    else:
+        emit('penize', {'penize': penize})
+        socketio.start_background_task(ulozeni, request.sid, suma)

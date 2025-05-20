@@ -24,10 +24,6 @@ function Init() {
     socket.emit('init');
 }
 
-function Uloz() {  
-    socket.emit('uloz', { 'suma': document.getElementById('ulozeni').value});
-}
-
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
 window.addEventListener("load", () => {
@@ -75,19 +71,7 @@ socket.on('receive_message', function (data) {
     messages.appendChild(messageItem);
 });
 
-socket.on('banka', (data) => {
-    const banka = document.getElementById("dluhy");
-    let dluh = document.getElementById(data.idb);
-    if (!dluh) {
-        dluh = document.createElement("li");
-        dluh.id = data.idb;
-        banka.appendChild(dluh);
-    }
-    dluh.textContent = "Uloženo: " + data.suma + "$, ještě: " + data.cas;
-    if (data.cas === '00:00:00') {
-        dluh.remove()
-    }
-});
+
 
 socket.on('zavod', (data) => {
     let idz = data.trasa + data.start
