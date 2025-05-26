@@ -1,3 +1,4 @@
+from logging.handlers import WatchedFileHandler
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
@@ -93,8 +94,17 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
                 prvek.append(seznamkrazeni.pop())
         serazeno.append(prvek)
-    #stav = seřazeno, je třeba rozdělit body a odeslat, jak vypadá výstup je vidět v kódu pokus.py v VS Code na malém počítači
-        #TODO: vyhodnocení a odeslání výsledků 
+    maxzisk = jizda * 100 # maximální zisk za závod, 100% zisk
+    misto = 1
+    while misto >= 0.55 and serazeno != []:
+        obodovat = serazeno.pop(0)
+        for zavodnik in obodovat:
+            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': misto * maxzisk}, to=usernames.get(zavodnik[0]))
+
+        misto -= 0.05 * len(obodovat)
+    for zavodnik in obodovat:
+        socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': 0.5 * maxzisk}, to=usernames.get(zavodnik[0]))
+        #TODO: udělat příjem emit a  uložit do tabulky peníze
 
 
 
