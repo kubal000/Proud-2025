@@ -28,7 +28,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 10 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 1 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -54,8 +54,10 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         m = (zbyva % 3600) // 60
         s = zbyva % 60
         for username, sid in usernames.items():
-            if [username, "A"] in a[index][2] or [username, 'B'] in a[index][2]:
-                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+            if [username, "A"] in a[index][2]:
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "A"}, to=sid)
+            elif [username, 'B'] in a[index][2]:
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "B"}, to=sid)
             else:
                 socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
         socketio.sleep(1 - (time.time() % 1))
@@ -99,12 +101,14 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
     while misto >= 0.55 and serazeno != []:
         obodovat = serazeno.pop(0)
         for zavodnik in obodovat:
-            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': misto * maxzisk}, to=usernames.get(zavodnik[0]))
-
+            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': int(misto * maxzisk)}, to=usernames.get(zavodnik[0]))
+            tabulka(zavodnik[0], 'body', int(misto * maxzisk))
         misto -= 0.05 * len(obodovat)
-    for zavodnik in obodovat:
-        socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': 0.5 * maxzisk}, to=usernames.get(zavodnik[0]))
-        #TODO: udělat příjem emit a  uložit do tabulky peníze
+    for misto in serazeno:
+        for zavodnik in misto:
+            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': int(0.5 * maxzisk)}, to=usernames.get(zavodnik[0]))
+            tabulka(zavodnik[0], 'body', int(0.5 * maxzisk))
+            #TODO: udělat příjem emit a  uložit do tabulky body
 
 
 
@@ -258,8 +262,10 @@ def handle_send_message(data):
     emit('receive_message', {'sender': sender_name, 'message': message}, to=sender_sid)
 
 @socketio.on('uloha')
-def uloha(data=None):   
-    emit('penize', {'penize': tabulka(sid_to_username.get(request.sid), 'penize', 50)})
+def uloha(data=None):
+    username = sid_to_username.get(request.sid)
+    tabulka(username, 'body', 50) # body za úlohu
+    emit('penize', {'penize': tabulka(username, 'penize', 50)})
 
 @socketio.on('zvedni')
 def zvedni(data):
