@@ -1,11 +1,57 @@
+
+
+ul {
+    list-style-type: none;
+}
+
+button {
+    border-radius: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    background-color: rgb(200, 140, 0);
+    border: 1px solid rgb(150, 100, 0);
+    margin: 2px;
+}
+
+    button:hover {
+        background-color: rgb(200, 150, 0)
+    }
+
+h5 {
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 30px;
+}
 body {
-  width: 1000px;
-  margin: auto; 
-  background-color: rgb(255, 200, 0);
-  text-align: center;
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  grid-template-rows: auto auto auto auto;
+    width: 1000px;
+    margin: auto;
+    background-color: rgb(255, 200, 0);
+    text-align: center;
+}
+#bodyhrac {
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+    grid-template-rows: auto auto auto auto;
+}
+#bodyeditor {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+}
+#casovacb {
+    width: 50%;
+    height: 20px;
+    margin: auto;
+    margin-top: 10px;
+}
+.zprava {
+    width: 50%;
+    margin: auto;
+    margin-top: 5px;
 }
 .staty {
     grid-column: 1/4;
@@ -39,14 +85,13 @@ body {
 .zavody {
   grid-column: 2/3;
 }
-ul {
-  list-style-type: none;
-}
+
 .hra {
     display: none;
 }
 .hranone {
     display: block;
+    width: 150%;
 }
 
 .faktor {
@@ -56,23 +101,3 @@ ul {
     margin-left: 5px;
 }
 
-button {
-    border-radius: 5px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    background-color: rgb(200, 140, 0);
-    border: 1px solid rgb(150, 100, 0);
-    margin: 2px;
-}
-button:hover {
-    background-color: rgb(200, 150, 0)
-}
-h5 {
-    margin-bottom: 5px;
-    margin-top: 5px;
-    font-size: 20px;
-}
-
-h3 {
-    font-size: 30px;
-}

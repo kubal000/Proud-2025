@@ -49,6 +49,9 @@ socket.on('penize', (data) => {
     document.getElementById("penize").textContent = data.penize + " $"
 });
 
+socket.on('pocetuloh', (data) => {
+    document.getElementById("pocetuloh").textContent = data.pocetuloh
+})
 socket.on('chyba', (data) => {
     alert(data.zprava)
 });
@@ -84,7 +87,7 @@ socket.on('zavod', (data) => {
             kategorie.appendChild(zavod);
             let text = document.createElement('label')
             text.id = idz + 'label'
-            text.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min a hodnocením: " + data.motor + " " + data.brzda + ", začíná za: " + data.cas
+            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas
             zavod.appendChild(text);
             let buttonA = document.createElement('button')
             buttonA.textContent = "Přihlásit formuli A"
@@ -97,7 +100,7 @@ socket.on('zavod', (data) => {
         }
         else {
             let text = document.getElementById(idz + 'label')
-            text.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min a hodnocením: " + data.motor + " " + data.brzda + ", začíná za: " + data.cas
+            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas
         }
     } else if (data.stav === 'prihlaseno') {
         let zavod = document.getElementById(idz);
@@ -105,11 +108,11 @@ socket.on('zavod', (data) => {
             const kategorie = document.getElementById('prihlaseno')
             zavod = document.createElement("li");
             zavod.id = idz;
-            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min a hodnocením: " + data.motor + " " + data.brzda + ", začíná za: " + data.cas + " Přihlášena formule " + data.formule;
+            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
             kategorie.appendChild(zavod);
         }
         else {
-            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min a hodnocením: " + data.motor + " " + data.brzda + ", začíná za: " + data.cas + " Přihlášena formule " + data.formule;
+            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
         }
     } else if (data.stav === 'start') {
         let zavod = document.getElementById(idz);
@@ -121,12 +124,12 @@ socket.on('zavod', (data) => {
         if (!zavod) {
             zavod = document.createElement("li");
             zavod.id = idz;
-            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, poběží ještě: " + data.cas
+            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas
             kategorie.appendChild(zavod);
         }
         else {
             let zavod = document.getElementById(idz)
-            zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, poběží ještě: " + data.cas
+            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas
         }
     } else if (data.stav === 'cil') {
         idz = idz + 'j'
@@ -136,7 +139,7 @@ socket.on('zavod', (data) => {
         const kategorie = document.getElementById('probehle');
         let zavod = document.createElement('li');
         zavod.id = idz + 'h'
-        zavod.textContent = "Závod v: " + data.trasa + ", se startem: " + data.start + " min, skončil. Tvá formule " + data.formule + " ti přinesla: " + data.zisk + " bodů.";
+        zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, skončil. Formule " + data.formule + " ti přinesla: " + data.zisk + " bodů.";
         kategorie.appendChild(zavod);
     }
 })

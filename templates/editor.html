@@ -7,21 +7,23 @@
     <script src="static/editor.js"></script>
     <link href="static/styles.css" rel="stylesheet">
 </head>
-<body>
-    <div style="display:flex; flex-direction:column">
-        <button id="casovacb" onclick="StartTimer()">Spustit časovač</button>
-        <div id="casovac">Tímto tlačítkem spustíš hru!!!</div>
-        <table id="tabulka"></table>
+<body id="bodyeditor">
+    <div style="display:flex; flex-direction:column; grid-column:1/3; grid-row:1" class="okenko">
+        <button id="casovacb" onclick="StartTimer()">Spustit hru</button>
+        <h1 id="casovac">Tímto tlačítkem spustíš hru!!!</h1>
+    </div>
+    <table id="tabulka" class="okenko" style="grid-column: 1/3; grid-row: 2"></table>
+    <div style="display: flex; flex-direction: column; grid-column: 1; grid-row: 3" class="okenko">
         <h2>Online týmy:</h2>
         <ul id="online_users"></ul>
-        <h2>Zprávy</h2>
-        <div style="display:flex; flex-direction:row">
-            <label for="target_user">Příjemce: </label>
-            <input id="target_user">
-            <textarea id="message" placeholder="Napište zprávu..."></textarea>
-            <button onclick="sendMessage()">Poslat zprávu</button>
-        </div>
-        <h3>Tvá komunikace:</h3>
+    </div>
+    <div style="display: flex; flex-direction: column; grid-column: 2; grid-row: 3" class="okenko">
+        <h2>Komunikace</h2>
+        <h4>Zprávy</h4>
+        <input id="target_user" placeholder="Zadej příjemce..." class="zprava">
+        <textarea id="message" placeholder="Napište zprávu..." class="zprava"></textarea>
+        <button onclick="sendMessage()" class="zprava">Poslat zprávu</button>
+        <h4>Tvá komunikace:</h4>
         <ul id="messages" style="display:flex; flex-direction:column-reverse"></ul>
     </div>
 </body>

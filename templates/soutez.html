@@ -7,7 +7,7 @@
     <script src="static/funkce.js"></script>
     <link href="static/styles.css" rel="stylesheet">
 </head>
-<body onload="Init()">
+<body onload="Init()" id="bodyhrac">
     <h1 class="nadpis">Herní pole pro tým: {{ username }}</h1>
     <div class="staty hra okenko">
         <div><h5>Peníze:</h5><div id='penize'>error</div></div>
@@ -51,9 +51,11 @@
     <div class="ulohy bloky hra okenko">
         <h3>Odevzdání úlohy</h3>
         <button onclick="Uloha()">Odevzdat další</button>
+        <p>Počet odevzdaných úloh: <span id="pocetuloh">error</span></p>
+
     </div>
     <div class="zavody bloky hra okenko">
-        <h3>Zavody</h3>
+        <h3>Závody</h3>
         <h4>K příhlášení:</h4>
         <ul id="prihlasovani"></ul>
         <h4>Přihlášeno:</h4>
@@ -68,9 +70,9 @@
         <h2>Zprávy</h2>
         <p>Zde si můžeš popovídat s člověkem u hlavního počítače.</p>
         <label>Příjemce: <span id="target_user">Editor</span></label>
-        <textarea id="message" placeholder="Napište zprávu..."></textarea>
-        <button onclick="sendMessage()">Poslat zprávu</button>
-        <h3>Tvá komunikace:</h3>
+        <textarea id="message" placeholder="Napište zprávu..." class="zprava"></textarea>
+        <button onclick="sendMessage()" class="zprava">Poslat zprávu</button>
+        <h2>Tvá komunikace:</h2>
         <ul id="messages" style="display:flex; flex-direction:column-reverse"></ul>
         <ul id="online_users" style="display:none"></ul>
     </div>

@@ -85,6 +85,6 @@ socket.on('tabulka', function (data) {
         });
     });
 
-    document.body.appendChild(table);
+
 });
 

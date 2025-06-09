@@ -80,7 +80,8 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         s = zbyva % 60
         for zavodnik in a[index][2]:
             sid = usernames.get(zavodnik[0])
-            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, }, to=sid)
+            formule = zavodnik[1]
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'formule': formule}, to=sid)
         socketio.sleep(1 - (time.time() % 1))
     for zavodnik in a[index][2]:
         sid = usernames.get(zavodnik[0])
@@ -215,9 +216,10 @@ def init():
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
     if tym not in df.index:
-        df.loc[tym] = [0, 0, 0, 0, 0, 0]           # nastavení základních hodnot
+        df.loc[tym] = [0, 0, 0, 0, 0, 0, 0]           # nastavení základních hodnot
         df.to_csv('tymy.csv', index=True)
     emit('penize', {'penize': str(df.loc[tym, 'penize'])})
+    emit('pocetuloh', {'pocetuloh': str(df.loc[tym, 'ulohy'])})
     for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
         emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(25*(df.loc[tym, faktor]+2))})
     PosliTabulkuEditorovi()
@@ -259,13 +261,16 @@ def handle_send_message(data):
     target_sid = usernames.get(target_user)
     if target_sid:
         emit('receive_message', {'sender': sender_name, 'message': message}, to=target_sid)
-    emit('receive_message', {'sender': sender_name, 'message': message}, to=sender_sid)
+        emit('receive_message', {'sender': sender_name, 'message': message}, to=sender_sid)
+    else:
+        emit('chyba', {'zprava':"Cíl zprávy není přihlášený."})
 
 @socketio.on('uloha')
 def uloha(data=None):
     username = sid_to_username.get(request.sid)
     tabulka(username, 'body', 50) # body za úlohu
     emit('penize', {'penize': tabulka(username, 'penize', 50)})
+    emit('pocetuloh', {'pocetuloh': tabulka(username, 'ulohy', 1)})
 
 @socketio.on('zvedni')
 def zvedni(data):
@@ -307,7 +312,7 @@ def prihlaszavod(data):
                 if s:
                     a[i][2].append([tym,formule])
                     emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start})
-                    emit('chyba', {'zprava': f'Úspěšně přihlášeno do závodu! {trasa}, {cas}'})
+                    #emit('chyba', {'zprava': f'Úspěšně přihlášeno do závodu! {trasa}, {cas}'})
                 else:
                     emit('chyba', {'zprava': 'Závod se překrývá s jiným závodem ve kterém máš formuli!'})
             else:
