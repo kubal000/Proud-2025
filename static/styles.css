@@ -61,6 +61,11 @@ body {
     justify-content: space-around;
     
 }
+.trasa {
+    width: 48%;
+    margin-bottom: 0.4em;
+}
+
 .okenko {
     background-color: rgb(255, 215, 60);
     margin: 5px;

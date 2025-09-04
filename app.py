@@ -5,12 +5,11 @@ import pandas as pd
 import time
 import copy
 
-#TODO: vyhodnocování závodu
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
-
+#TODO: vyřešit promítání na plátno
 # Pamatujeme si přihlášené uživatele a jejich připojení
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
@@ -28,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 1 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 3 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -59,7 +58,7 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
             elif [username, 'B'] in a[index][2]:
                 socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "B"}, to=sid)
             else:
-                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)
+                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)      
         socketio.sleep(1 - (time.time() % 1))
     for username, sid in usernames.items():
         socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
@@ -109,7 +108,6 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         for zavodnik in misto:
             socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': int(0.5 * maxzisk)}, to=usernames.get(zavodnik[0]))
             tabulka(zavodnik[0], 'body', int(0.5 * maxzisk))
-            #TODO: udělat příjem emit a  uložit do tabulky body
 
 
 
@@ -151,6 +149,7 @@ def casovac(tym, cas):
         m = (zbyva % 3600) // 60
         s = zbyva % 60
         socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=usernames.get(tym))
+        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=usernames.get("Platno"))
         socketio.sleep(1 - (time.time() % 1))
 
 def PosliTabulkuEditorovi():
@@ -189,10 +188,12 @@ def index():
 def login():
     username = request.args.get('username')
     heslo = request.args.get('heslo')
-    if heslo == 'Proud2025' and username != 'Editor':
-        return redirect(url_for('soutez', username=username))
-    elif heslo == 'Proud2025e' and username == 'Editor':
+    if heslo == 'Proud2025e' and username == 'Editor':
         return redirect(url_for('editor', username=username))
+    elif heslo == 'Proud2025e' and username == 'Platno':
+        return redirect(url_for('platno', username=username))
+    elif heslo == 'Proud2025':
+        return redirect(url_for('soutez', username=username))
     else:
         return redirect(url_for('index'))
 
@@ -209,6 +210,13 @@ def editor():
     if not username:
         return redirect(url_for('index'))
     return render_template('editor.html', username=username)
+
+@app.route('/platno')
+def platno():
+    username = request.args.get('username')
+    if not username:
+        return redirect(url_for('index'))
+    return render_template('platno.html', username=username)
 
 @socketio.on('init')
 def init():
