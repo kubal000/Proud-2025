@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>Plátno</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
-    <script src="static/platno.js"></script>
+    <script src="static/platno.js" rel="stylesheet"></script>
     <link href="static/styles.css" rel="stylesheet">
 </head>
 <body id="bodyeditor">
     <h1 id="casovac" style="font-size:50px" class="nadpis">Hra ještě nezačala!!!</h1>
-    <div style="grid-column: 1; grid-row: 2; display: flex; flex-wrap: wrap; justify-content: space-evenly;">
+    <div style="grid-column: 1; grid-row: 2; display: flex; flex-wrap: wrap; justify-content: space-evenly; align-items: center">
         <img src="{{ url_for('static', filename='img/A.png') }}" class="trasa"/>
         <img src="{{ url_for('static', filename='img/B.png') }}" class="trasa"/>
         <img src="{{ url_for('static', filename='img/C.png') }}" class="trasa"/>

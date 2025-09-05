@@ -9,7 +9,7 @@ import copy
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
-#TODO: vyřešit promítání na plátno
+#TODO: dodělat zbylá zpětná tlačítka a jejich funkce
 # Pamatujeme si přihlášené uživatele a jejich připojení
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
@@ -27,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 3 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 1 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -81,15 +81,18 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
             sid = usernames.get(zavodnik[0])
             formule = zavodnik[1]
             socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'formule': formule}, to=sid)
+        socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start}, to=usernames.get("Platno"))
         socketio.sleep(1 - (time.time() % 1))
     for zavodnik in a[index][2]:
         sid = usernames.get(zavodnik[0])
         socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
+    socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=usernames.get("Platno"))
     seznamkrazeni = []
     for tym in dataoformulich.keys():
         info = dataoformulich[tym]
         seznamkrazeni.append([tym, info[0], info[1]*motor+info[2]*brzda])
     seznamkrazeni = sorted(seznamkrazeni, key=lambda x: x[2])
+    socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'cleni': len(seznamkrazeni)}, to=usernames.get('Platno'))
     serazeno = []
     while len(seznamkrazeni) > 0:
         prvek = [seznamkrazeni.pop()]
@@ -142,6 +145,7 @@ def casovac(tym, cas):
                 break
         if zbyva <= 0:
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get(tym))
+            socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get("Platno"))
             ZpravaVsem('Hra konci', 'hra')
             herni_stav = 'nebezi'
             break
@@ -274,11 +278,16 @@ def handle_send_message(data):
         emit('chyba', {'zprava':"Cíl zprávy není přihlášený."})
 
 @socketio.on('uloha')
-def uloha(data=None):
+def uloha(data):
     username = sid_to_username.get(request.sid)
-    tabulka(username, 'body', 50) # body za úlohu
-    emit('penize', {'penize': tabulka(username, 'penize', 50)})
-    emit('pocetuloh', {'pocetuloh': tabulka(username, 'ulohy', 1)})
+    df = pd.read_csv("tymy.csv")
+    df.set_index('tym', inplace=True)
+    if df.loc[username, 'penize'] + data['pocet']*50 < 0:
+        emit('chyba', {'zprava': 'Nemohu provést, tvé peníze by klesli pod nulu! Nejprve vrať chybně provedené placení, pak až vracej úlohu.'})
+        return
+    tabulka(username, 'body', data['pocet']*50) # body za úlohu
+    emit('penize', {'penize': tabulka(username, 'penize', data['pocet']*50)})
+    emit('pocetuloh', {'pocetuloh': tabulka(username, 'ulohy', data['pocet'])})
 
 @socketio.on('zvedni')
 def zvedni(data):

@@ -8,8 +8,8 @@ function sendMessage() {
     });
 }
 
-function Uloha() {
-    socket.emit('uloha');
+function Uloha(pocet) {
+    socket.emit('uloha', { 'pocet': pocet });
 }
 
 function Prihlas(trasa, start, formule) {
@@ -23,6 +23,17 @@ function Zvedni(faktor) {
 function Init() {
     socket.emit('init');
 }
+
+function ToPlavcik() {
+    document.getElementById("bodyhrac").classList.add("plavcik-mode");
+    document.getElementById("bodyhrac").style.backgroundColor = "aqua";
+}
+
+function ToHrac() {
+    document.getElementById("bodyhrac").classList.remove("plavcik-mode");
+    document.getElementById("bodyhrac").style.backgroundColor = "rgb(255, 200, 0)";
+}
+
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
@@ -91,10 +102,12 @@ socket.on('zavod', (data) => {
             zavod.appendChild(text);
             let buttonA = document.createElement('button')
             buttonA.textContent = "Přihlásit formuli A"
+            buttonA.classList = "hrac"
             buttonA.onclick = () => Prihlas(data.trasa, data.start, "A")
             zavod.appendChild(buttonA);
             let buttonB = document.createElement('button')
             buttonB.textContent = "Přihlásit formuli B"
+            buttonB.classList = "hrac"
             buttonB.onclick = () => Prihlas(data.trasa, data.start, "B")
             zavod.appendChild(buttonB);
         }
@@ -124,12 +137,12 @@ socket.on('zavod', (data) => {
         if (!zavod) {
             zavod = document.createElement("li");
             zavod.id = idz;
-            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas
+            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
             kategorie.appendChild(zavod);
         }
         else {
             let zavod = document.getElementById(idz)
-            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas
+            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
         }
     } else if (data.stav === 'cil') {
         idz = idz + 'j'

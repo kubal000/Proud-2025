@@ -9,11 +9,30 @@ window.addEventListener("load", () => {
 });
 
 socket.on('casovac', (data) => {
-    document.getElementById("casovac").textContent = data.cas
+    
     if (data.cas === '00:00:00') {
-        document.getElementById("casovac").textContent = "Čas vypršel"
+        document.getElementById("casovac").textContent = "Čas vypršel";
+        document.getElementById("bodyeditor").style.backgroundColor = "red";
+    } else {
+        document.getElementById("casovac").textContent = data.cas;
+        
     }
 });
+
+socket.on('hra', function (data) {
+
+    const stav = data.zprava;
+
+    if (stav === 'Hra zacina') {
+        document.getElementById("prihlasovani").innerHTML = "";
+        document.getElementById("jizda").innerHTML = "";
+        document.getElementById("probehle").innerHTML = "";
+        document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
+    }
+    if (stav === 'Hra konci') {
+        
+    }
+})
 
 socket.on('chyba', (data) => {
     alert(data.zprava)
@@ -59,7 +78,7 @@ socket.on('zavod', (data) => {
         const kategorie = document.getElementById('probehle');
         let zavod = document.createElement('li');
         zavod.id = idz + 'h'
-        zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, skončil.;
+        zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, skončil. Dojelo " + data.cleni + " formulí.";
         kategorie.appendChild(zavod);
     }
 })

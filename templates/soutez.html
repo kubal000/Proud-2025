@@ -18,13 +18,13 @@
                     <div>
                         Motor: <span id="A_motor">error</span>
                     </div>
-                    <button onclick="Zvedni('A_motor')" id="A_motorb" class="faktorbutton">error</button>
+                    <button onclick="Zvedni('A_motor')" id="A_motorb" class="faktorbutton hrac">error</button>
                 </div>
                 <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Brzda: <span id="A_brzda">error</span>
                     </div>    
-                    <button onclick="Zvedni('A_brzda')" id="A_brzdab" class="faktorbutton">error</button>
+                    <button onclick="Zvedni('A_brzda')" id="A_brzdab" class="faktorbutton hrac">error</button>
                 </div>
             </div>
         </div>
@@ -36,21 +36,22 @@
                         Motor: <span id="B_motor">error</span>
                     </div>
                     
-                    <button onclick="Zvedni('B_motor')" id="B_motorb" class="faktorbutton">error</button>
+                    <button onclick="Zvedni('B_motor')" id="B_motorb" class="faktorbutton hrac">error</button>
                 </div>
                 <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Brzda: <span id="B_brzda">error</span>
                     </div>
                     
-                    <button onclick="Zvedni('B_brzda')" id="B_brzdab" class="faktorbutton">error</button>
+                    <button onclick="Zvedni('B_brzda')" id="B_brzdab" class="faktorbutton hrac">error</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="ulohy bloky hra okenko">
         <h3>Odevzdání úlohy</h3>
-        <button onclick="Uloha()">Odevzdat další</button>
+        <button onclick="Uloha(1)" class="hrac">Odevzdat další</button>
+        <button onclick="Uloha(-1)" class="plavcik">Ubrat úlohu</button>
         <p>Počet odevzdaných úloh: <span id="pocetuloh">error</span></p>
 
     </div>
@@ -67,7 +68,7 @@
     </div>
     <h2 class="hranone okenko">Zde se zobrazí herní prvky...</h2>
     <div class="komunikace okenko">
-        <h2>Zprávy</h2>
+        <div><h2>Plavčík</h2><button onclick="ToPlavcik()" class="hrac" style="background-color:aqua">Zapni mód pro Plavčíka</button><button onclick="ToHrac()" class="plavcik">Zapni mód pro Hráče</button></div>
         <p>Zde si můžeš popovídat s člověkem u hlavního počítače.</p>
         <label>Příjemce: <span id="target_user">Editor</span></label>
         <textarea id="message" placeholder="Napište zprávu..." class="zprava"></textarea>

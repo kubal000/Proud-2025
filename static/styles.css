@@ -17,6 +17,25 @@ button {
         background-color: rgb(200, 150, 0)
     }
 
+
+/* Výchozí stav: hráè */
+.hrac {
+    display: inline-block;
+}
+.plavcik {
+    display: none;
+}
+
+/* Mód plavèík */
+.plavcik-mode .hrac {
+    display: none;
+}
+.plavcik-mode .plavcik {
+    display: inline-block;
+    background-color: aqua;
+}
+
+
 h5 {
     margin-bottom: 5px;
     margin-top: 5px;
