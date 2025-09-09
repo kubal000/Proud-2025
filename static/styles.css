@@ -44,6 +44,7 @@ h5 {
 
 h3 {
     font-size: 30px;
+    margin-bottom: 0;
 }
 body {
     width: 1000px;
@@ -81,8 +82,8 @@ body {
     
 }
 .trasa {
-    width: 48%;
-    margin-bottom: 0.4em;
+    width: 29.7%;
+    margin-top: 1em;
 }
 
 .okenko {

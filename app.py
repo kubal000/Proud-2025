@@ -92,7 +92,6 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         info = dataoformulich[tym]
         seznamkrazeni.append([tym, info[0], info[1]*motor+info[2]*brzda])
     seznamkrazeni = sorted(seznamkrazeni, key=lambda x: x[2])
-    socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'cleni': len(seznamkrazeni)}, to=usernames.get('Platno'))
     serazeno = []
     while len(seznamkrazeni) > 0:
         prvek = [seznamkrazeni.pop()]
@@ -293,17 +292,26 @@ def uloha(data):
 def zvedni(data):
     # dokončit placení s ošetřením nevlastnění peněz
     faktor = data['faktor']
+    smer = data['pocet']
     tym = sid_to_username.get(request.sid)
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
     vec = df.loc[tym, faktor]
-    penize = tabulka(tym, 'penize', -25*(vec+2))
-    if penize == False:
-        emit('faktory', {'faktor': faktor, 'cislo': False, 'dalsicena': False})
+    
+    if smer == 1:
+        penize = tabulka(tym, 'penize', -25*(vec+2))
+        if penize == False:
+            emit('chyba', {'zprava': "Nemáš dostatek peněz na vylepšení"})
+        else:
+            emit('penize', {'penize': penize})
+            emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
     else:
-        emit('penize', {'penize': penize})
-        emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
-
+        stav = tabulka(tym, faktor, -1)
+        if stav == False:
+            emit('chyba', {'zprava': "Máš nejnižší možný faktor"})
+        else:
+            emit('penize', {'penize': tabulka(tym, 'penize', 25*(vec+1))})
+            emit('faktory', {'faktor': faktor, 'cislo': stav, 'dalsicena': str(25*(vec+1))})
 
 
 #   ZAVODU

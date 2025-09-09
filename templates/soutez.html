@@ -18,13 +18,15 @@
                     <div>
                         Motor: <span id="A_motor">error</span>
                     </div>
-                    <button onclick="Zvedni('A_motor')" id="A_motorb" class="faktorbutton hrac">error</button>
+                    <button onclick="Zvedni('A_motor', 1)" id="A_motorb" class="faktorbutton hrac">error</button>
+                    <button onclick="Zvedni('A_motor', -1)" class="faktorbutton plavcik">Sniž motor A</button>
                 </div>
                 <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Brzda: <span id="A_brzda">error</span>
-                    </div>    
-                    <button onclick="Zvedni('A_brzda')" id="A_brzdab" class="faktorbutton hrac">error</button>
+                    </div>
+                    <button onclick="Zvedni('A_brzda', 1)" id="A_brzdab" class="faktorbutton hrac">error</button>
+                    <button onclick="Zvedni('A_brzda', -1)" class="faktorbutton plavcik">Sniž brzdu A</button>
                 </div>
             </div>
         </div>
@@ -35,15 +37,17 @@
                     <div>
                         Motor: <span id="B_motor">error</span>
                     </div>
-                    
-                    <button onclick="Zvedni('B_motor')" id="B_motorb" class="faktorbutton hrac">error</button>
+
+                    <button onclick="Zvedni('B_motor', 1)" id="B_motorb" class="faktorbutton hrac">error</button>
+                    <button onclick="Zvedni('B_motor', -1)" class="faktorbutton plavcik">Sniž motor B</button>
                 </div>
                 <div style="display:flex;flex-direction:row" class="faktor">
                     <div>
                         Brzda: <span id="B_brzda">error</span>
                     </div>
-                    
-                    <button onclick="Zvedni('B_brzda')" id="B_brzdab" class="faktorbutton hrac">error</button>
+
+                    <button onclick="Zvedni('B_brzda', 1)" id="B_brzdab" class="faktorbutton hrac">error</button>
+                    <button onclick="Zvedni('B_brzda', -1)" class="faktorbutton plavcik">Sniž brzdu B</button>
                 </div>
             </div>
         </div>

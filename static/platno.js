@@ -74,11 +74,5 @@ socket.on('zavod', (data) => {
         idz = idz + 'j'
         let zavod = document.getElementById(idz);
         zavod.remove()
-    } else if (data.stav === 'hodnoceni') {
-        const kategorie = document.getElementById('probehle');
-        let zavod = document.createElement('li');
-        zavod.id = idz + 'h'
-        zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, skončil. Dojelo " + data.cleni + " formulí.";
-        kategorie.appendChild(zavod);
     }
 })

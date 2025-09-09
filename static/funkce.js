@@ -16,8 +16,8 @@ function Prihlas(trasa, start, formule) {
     socket.emit('prihlaszavod', { 'trasa': trasa, 'start': start, 'formule':formule})
 }
 
-function Zvedni(faktor) {
-    socket.emit('zvedni', { 'faktor': faktor });
+function Zvedni(faktor, pocet) {
+    socket.emit('zvedni', { 'faktor': faktor, 'pocet':pocet});
 }
 
 function Init() {
@@ -68,14 +68,8 @@ socket.on('chyba', (data) => {
 });
 
 socket.on('faktory', (data) => {
-    if (data.cislo === false) {
-        alert("Nemáš dostatek peněz na vylepšení")
-    }
-    else {
-        document.getElementById(data.faktor).textContent = "level " + data.cislo + " "
-        document.getElementById(data.faktor + "b").textContent = "Vylepši za: " + data.dalsicena + "$"
-    }
-
+    document.getElementById(data.faktor).textContent = "level " + data.cislo + " ";
+    document.getElementById(data.faktor + "b").textContent = "Vylepši za: " + data.dalsicena + "$";
 });
 
 socket.on('receive_message', function (data) {
