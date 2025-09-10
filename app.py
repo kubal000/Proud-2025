@@ -9,7 +9,7 @@ import copy
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tajny_klic'
 socketio = SocketIO(app, async_mode='eventlet')
-#TODO: dodělat zbylá zpětná tlačítka a jejich funkce
+#TODO: dodělat odhlašování ze závodů dořeštit chyby (asi na straně app.py)
 # Pamatujeme si přihlášené uživatele a jejich připojení
 usernames = {}       # jméno → sid (socket id)
 sid_to_username = {} # sid → jméno
@@ -27,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 1 # nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 3# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -47,6 +47,7 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
     motor = int(df.loc[trasa, 'motor'])
     brzda = int(df.loc[trasa, 'brzda'])
     Zacatek = konechry - start * min 
+    global a
     while Zacatek > time.time():
         zbyva = Zacatek - time.time()
         h = zbyva // 3600
@@ -64,14 +65,17 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
     dftymy = pd.read_csv("tymy.csv", encoding='utf-8')
     dftymy.set_index('tym', inplace=True)
-    dataoformulich = {} # tym → [formule, motor, brzda]
+    
 
-    for zavodnik in a[index][2]:
+    for i in range(len(a[index][2])):
+        zavodnik = a[index][2][i]
         if zavodnik[0] in dftymy.index:
             formule = zavodnik[1]
             zmotor = int(dftymy.loc[zavodnik[0], f'{formule}_motor'])
             zbrzda = int(dftymy.loc[zavodnik[0], f'{formule}_brzda'])
-            dataoformulich[zavodnik[0]] = [formule, zmotor, zbrzda]
+            a[index][2][i].append(zmotor)
+            a[index][2][i].append(zbrzda)
+            #dataoformulich[zavodnik[0]] = [formule, zmotor, zbrzda]
     for prubeh in range(jizda*min):
         zbyva = jizda*min - prubeh
         h = zbyva // 3600
@@ -88,6 +92,9 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
     socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=usernames.get("Platno"))
     seznamkrazeni = []
+    dataoformulich = {} # tym → [formule, motor, brzda]
+    for zavodnik in a[index][2]:
+        dataoformulich[zavodnik[0]] = [zavodnik[1], zavodnik[2], zavodnik[3]]
     for tym in dataoformulich.keys():
         info = dataoformulich[tym]
         seznamkrazeni.append([tym, info[0], info[1]*motor+info[2]*brzda])
@@ -314,7 +321,7 @@ def zvedni(data):
             emit('faktory', {'faktor': faktor, 'cislo': stav, 'dalsicena': str(25*(vec+1))})
 
 
-#   ZAVODU
+#   ZAVODY
 
 @socketio.on('prihlaszavod')
 def prihlaszavod(data):
@@ -342,9 +349,27 @@ def prihlaszavod(data):
                     emit('chyba', {'zprava': 'Závod se překrývá s jiným závodem ve kterém máš formuli!'})
             else:
                 emit('chyba', {'zprava': 'Již přihlášeno do závodu!'})
-            index = i
             break
 
+@socketio.on('odhlaszavod')
+def odhlaszavod(data):
+    tym = sid_to_username.get(request.sid)
+    trasa = data['trasa']
+    start = float(data['start'])
+    global a
+    for i in range(len(a)):
+        if a[i][0]== trasa and a[i][1] == start:
+            if [tym,'A'] in a[i][2]:
+                a[i][2].remove([tym,'A'])
+                emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start})
+                #emit('chyba', {'zprava': f'Úspěšně odhlášeno ze závodu! {trasa}'})
+            elif [tym,'B'] in a[i][2]:
+                a[i][2].remove([tym,'B'])
+                emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start})
+                #emit('chyba', {'zprava': f'Úspěšně odhlášeno ze závodu! {trasa}'})
+            else:
+                emit('chyba', {'zprava': 'Nejste přihlášen do závodu!'})
+            break
 #   CASOMIRY
 
 @socketio.on('start_timer')

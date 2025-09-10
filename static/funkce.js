@@ -16,6 +16,10 @@ function Prihlas(trasa, start, formule) {
     socket.emit('prihlaszavod', { 'trasa': trasa, 'start': start, 'formule':formule})
 }
 
+function Odhlas(trasa, start) {
+    socket.emit('odhlaszavod', { 'trasa': trasa, 'start': start })
+}
+
 function Zvedni(faktor, pocet) {
     socket.emit('zvedni', { 'faktor': faktor, 'pocet':pocet});
 }
@@ -115,37 +119,54 @@ socket.on('zavod', (data) => {
             const kategorie = document.getElementById('prihlaseno')
             zavod = document.createElement("li");
             zavod.id = idz;
-            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
             kategorie.appendChild(zavod);
+            let text = document.createElement('label')
+            text.id = idz + 'label'
+            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
+            zavod.appendChild(text);
+            let button = document.createElement('button')
+            button.textContent = "Odhlásit"
+            button.classList = "plavcik"
+            button.onclick = () => Odhlas(data.trasa, data.start)
+            zavod.appendChild(button);
         }
         else {
-            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
+            let text = document.getElementById(idz + 'label')
+            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
         }
     } else if (data.stav === 'start') {
         let zavod = document.getElementById(idz);
         zavod.remove()
     } else if (data.stav === 'jizda') {
-        idz = idz + 'j'
+        idz = idz
         const kategorie = document.getElementById('jizda')
         let zavod = document.getElementById(idz);
         if (!zavod) {
             zavod = document.createElement("li");
             zavod.id = idz;
-            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
             kategorie.appendChild(zavod);
+            let text = document.createElement('label')
+            text.id = idz + 'label'
+            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
+            zavod.appendChild(text);
+            let button = document.createElement('button')
+            button.textContent = "Odhlásit"
+            button.classList = "plavcik"
+            button.onclick = () => Odhlas(data.trasa, data.start)
+            zavod.appendChild(button);
         }
         else {
-            let zavod = document.getElementById(idz)
-            zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
+            let text = document.getElementById(idz + 'label')
+            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
         }
     } else if (data.stav === 'cil') {
-        idz = idz + 'j'
+        idz = idz
         let zavod = document.getElementById(idz);
         zavod.remove()
     } else if (data.stav === 'hodnoceni') {
         const kategorie = document.getElementById('probehle');
         let zavod = document.createElement('li');
-        zavod.id = idz + 'h'
+        zavod.id = idz
         zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, skončil. Formule " + data.formule + " ti přinesla: " + data.zisk + " bodů.";
         kategorie.appendChild(zavod);
     }
