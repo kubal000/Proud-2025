@@ -27,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 3# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 1# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -81,11 +81,14 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
         s = zbyva % 60
+        print(a[index][2])
         for zavodnik in a[index][2]:
             sid = usernames.get(zavodnik[0])
             formule = zavodnik[1]
             socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'formule': formule}, to=sid)
-        socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start}, to=usernames.get("Platno"))
+        sid = usernames.get("Platno")
+        if sid:
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start}, to=sid)    
         socketio.sleep(1 - (time.time() % 1))
     for zavodnik in a[index][2]:
         sid = usernames.get(zavodnik[0])
