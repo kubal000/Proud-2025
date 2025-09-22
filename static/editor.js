@@ -13,6 +13,12 @@ function StartTimer() {
     document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
 }
 
+function Vypni() {
+    document.getElementById("vypnib").style.display = "none";
+    document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
+    socket.emit('vypni');
+}
+
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
 window.addEventListener("load", () => {
@@ -50,7 +56,9 @@ socket.on('casovac', (data) => {
     document.getElementById("casovac").textContent = data.cas
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel"
-        button.style.display = "block"; // Zobraz tlačítko pro spuštění časovače
+        document.getElementById("vypnib").style.display = "block";
+        document.getElementById("bodyeditor").style.backgroundColor = "grey";
+        
     } else if (button.style.display !== 'none'){
         button.style.display = 'none'
     }

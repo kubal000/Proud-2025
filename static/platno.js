@@ -12,10 +12,9 @@ socket.on('casovac', (data) => {
     
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel";
-        document.getElementById("bodyeditor").style.backgroundColor = "red";
+        document.getElementById("bodyeditor").style.backgroundColor = "grey";
     } else {
-        document.getElementById("casovac").textContent = data.cas;
-        
+        document.getElementById("casovac").textContent = data.cas;      
     }
 });
 
@@ -29,7 +28,7 @@ socket.on('hra', function (data) {
         document.getElementById("probehle").innerHTML = "";
         document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
     }
-    if (stav === 'Hra konci') {
+    if (stav === 'Vypni') {
         
     }
 })

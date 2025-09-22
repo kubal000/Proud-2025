@@ -67,21 +67,12 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
     dftymy.set_index('tym', inplace=True)
     
 
-    for i in range(len(a[index][2])):
-        zavodnik = a[index][2][i]
-        if zavodnik[0] in dftymy.index:
-            formule = zavodnik[1]
-            zmotor = int(dftymy.loc[zavodnik[0], f'{formule}_motor'])
-            zbrzda = int(dftymy.loc[zavodnik[0], f'{formule}_brzda'])
-            a[index][2][i].append(zmotor)
-            a[index][2][i].append(zbrzda)
-            #dataoformulich[zavodnik[0]] = [formule, zmotor, zbrzda]
+   
     for prubeh in range(jizda*min):
         zbyva = jizda*min - prubeh
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
         s = zbyva % 60
-        print(a[index][2])
         for zavodnik in a[index][2]:
             sid = usernames.get(zavodnik[0])
             formule = zavodnik[1]
@@ -94,10 +85,18 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         sid = usernames.get(zavodnik[0])
         socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
     socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=usernames.get("Platno"))
+    
+    dataoformulich = {}
+    for i in range(len(a[index][2])):
+        zavodnik = a[index][2][i]
+        if zavodnik[0] in dftymy.index:
+            formule = zavodnik[1]
+            zmotor = int(dftymy.loc[zavodnik[0], f'{formule}_motor'])
+            zbrzda = int(dftymy.loc[zavodnik[0], f'{formule}_brzda'])
+            dataoformulich[zavodnik[0]] = [formule, zmotor, zbrzda]
+     # tym → [formule, motor, brzda]
+
     seznamkrazeni = []
-    dataoformulich = {} # tym → [formule, motor, brzda]
-    for zavodnik in a[index][2]:
-        dataoformulich[zavodnik[0]] = [zavodnik[1], zavodnik[2], zavodnik[3]]
     for tym in dataoformulich.keys():
         info = dataoformulich[tym]
         seznamkrazeni.append([tym, info[0], info[1]*motor+info[2]*brzda])
@@ -156,7 +155,7 @@ def casovac(tym, cas):
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get(tym))
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get("Platno"))
             ZpravaVsem('Hra konci', 'hra')
-            herni_stav = 'nebezi'
+
             break
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
@@ -378,6 +377,12 @@ def odhlaszavod(data):
 @socketio.on('start_timer')
 def start_timer(data):
     socketio.start_background_task(casovac, sid_to_username.get(request.sid), data['cas'] * min)
+
+@socketio.on('vypni')
+def Vypni():
+    global herni_stav
+    herni_stav = 'nebezi'
+    ZpravaVsem('Vypni', 'hra')
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)

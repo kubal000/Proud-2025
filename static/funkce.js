@@ -189,6 +189,9 @@ socket.on('hra', function (data) {
         })
     }
     if (stav === 'Hra konci') {
+        document.getElementById("bodyhrac").style.backgroundColor = "grey";
+    }
+    if (stav === 'Vypni') {
         prvky.forEach(el => {
             el.style.display = 'none';
         })
