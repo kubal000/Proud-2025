@@ -29,7 +29,7 @@ socket.on('hra', function (data) {
         document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
     }
     if (stav === 'Vypni') {
-        
+        document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
     }
 })
 

@@ -195,6 +195,7 @@ socket.on('hra', function (data) {
         prvky.forEach(el => {
             el.style.display = 'none';
         })
+        document.getElementById("bodyhrac").style.backgroundColor = "rgb(255, 200, 0)";
         prvkynone.forEach(el => {
             el.style.display = 'block';
         })

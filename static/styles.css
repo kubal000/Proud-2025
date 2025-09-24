@@ -68,6 +68,10 @@ body {
     margin: auto;
     margin-top: 10px;
 }
+
+#vypnib {
+    display: none;
+}
 .zprava {
     width: 50%;
     margin: auto;

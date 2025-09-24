@@ -27,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 4# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 1# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -70,6 +70,8 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
    
     for prubeh in range(jizda*min):
         zbyva = jizda*min - prubeh
+        if herni_stav != 'bezi':
+            break
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
         s = zbyva % 60
@@ -155,6 +157,7 @@ def casovac(tym, cas):
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get(tym))
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get("Platno"))
             ZpravaVsem('Hra konci', 'hra')
+            herni_stav = 'konci'
 
             break
         h = zbyva // 3600
@@ -381,6 +384,44 @@ def start_timer(data):
 @socketio.on('vypni')
 def Vypni():
     global herni_stav
+
+
+    print(f'Konečný závod začíná!!!')
+    dftymy = pd.read_csv("tymy.csv", encoding='utf-8')
+    dftymy.set_index('tym', inplace=True)
+    
+    
+    dataoformulich = {}
+    for zavodnik in usernames.keys():
+        for formule in ["A","B"]:
+            if zavodnik in dftymy.index:
+                zmotor = int(dftymy.loc[zavodnik, f'{formule}_motor'])
+                zbrzda = int(dftymy.loc[zavodnik, f'{formule}_brzda'])
+                dataoformulich[(zavodnik,formule)] = [formule, zmotor, zbrzda]
+     # tym → [formule, motor, brzda]
+
+    seznamkrazeni = []
+    for tym in dataoformulich.keys():
+        info = dataoformulich[tym]
+        seznamkrazeni.append([tym, info[0], info[1]+info[2]])
+    seznamkrazeni = sorted(seznamkrazeni, key=lambda x: x[2])
+    serazeno = []
+    while len(seznamkrazeni) > 0:
+        prvek = [seznamkrazeni.pop()]
+        while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
+                prvek.append(seznamkrazeni.pop())
+        serazeno.append(prvek)
+    maxzisk = 1000 # maximální zisk za závod, 100% zisk
+    misto = 1
+    while misto >= 0.55 and serazeno != []:
+        obodovat = serazeno.pop(0)
+        for zavodnik in obodovat:
+            tabulka(zavodnik[0][0], 'body', int(misto * maxzisk))
+        misto -= 0.05 * len(obodovat)
+    for misto in serazeno:
+        for zavodnik in misto:
+            tabulka(zavodnik[0][0], 'body', int(0.5 * maxzisk))
+
     herni_stav = 'nebezi'
     ZpravaVsem('Vypni', 'hra')
 

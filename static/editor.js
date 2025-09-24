@@ -16,6 +16,7 @@ function StartTimer() {
 function Vypni() {
     document.getElementById("vypnib").style.display = "none";
     document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
+    document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
     socket.emit('vypni');
 }
 
