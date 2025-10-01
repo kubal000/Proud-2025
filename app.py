@@ -109,7 +109,7 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
                 prvek.append(seznamkrazeni.pop())
         serazeno.append(prvek)
-    maxzisk = jizda * 100 # maximální zisk za závod, 100% zisk
+    maxzisk = jizda * 50 # maximální zisk za závod, 100% zisk
     misto = 1
     while misto >= 0.55 and serazeno != []:
         obodovat = serazeno.pop(0)
@@ -411,7 +411,7 @@ def Vypni():
         while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
                 prvek.append(seznamkrazeni.pop())
         serazeno.append(prvek)
-    maxzisk = 1000 # maximální zisk za závod, 100% zisk
+    maxzisk = 500 # maximální zisk za závod, 100% zisk
     misto = 1
     while misto >= 0.55 and serazeno != []:
         obodovat = serazeno.pop(0)
