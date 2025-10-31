@@ -27,7 +27,7 @@ b = [
     80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
 ]
 
-min = 3# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
+min = 1# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
 
 def ZpravaVsem(zprava, emit):
     for username, sid in usernames.items():
@@ -50,16 +50,15 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
     global a
     while Zacatek > time.time():
         zbyva = Zacatek - time.time()
-        h = zbyva // 3600
-        m = (zbyva % 3600) // 60
+        m = zbyva // 60
         s = zbyva % 60
         for username, sid in usernames.items():
             if [username, "A"] in a[index][2]:
-                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "A"}, to=sid)
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "A"}, to=sid)
             elif [username, 'B'] in a[index][2]:
-                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "B"}, to=sid)
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "B"}, to=sid)
             else:
-                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)      
+                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)      
         socketio.sleep(1 - (time.time() % 1))
     for username, sid in usernames.items():
         socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
@@ -72,16 +71,15 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         zbyva = jizda*min - prubeh
         if herni_stav != 'bezi':
             break
-        h = zbyva // 3600
-        m = (zbyva % 3600) // 60
+        m = zbyva // 60
         s = zbyva % 60
         for zavodnik in a[index][2]:
             sid = usernames.get(zavodnik[0])
             formule = zavodnik[1]
-            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'formule': formule}, to=sid)
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'formule': formule}, to=sid)
         sid = usernames.get("Platno")
         if sid:
-            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(h):02d}:{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start}, to=sid)    
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start}, to=sid)    
         socketio.sleep(1 - (time.time() % 1))
     for zavodnik in a[index][2]:
         sid = usernames.get(zavodnik[0])
@@ -109,7 +107,7 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
                 prvek.append(seznamkrazeni.pop())
         serazeno.append(prvek)
-    maxzisk = jizda * 50 # maximální zisk za závod, 100% zisk
+    maxzisk = jizda * 100 # maximální zisk za závod, 100% zisk
     misto = 1
     while misto >= 0.55 and serazeno != []:
         obodovat = serazeno.pop(0)
@@ -244,7 +242,7 @@ def init():
     emit('penize', {'penize': str(df.loc[tym, 'penize'])})
     emit('pocetuloh', {'pocetuloh': str(df.loc[tym, 'ulohy'])})
     for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
-        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(25*(df.loc[tym, faktor]+2))})
+        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(50*(df.loc[tym, faktor]+2))})
     PosliTabulkuEditorovi()
 
 #@socketio.on('connect') # automaticky zavoláno při připojení - pokud nereaguji, není třeba mít.
@@ -293,11 +291,11 @@ def uloha(data):
     username = sid_to_username.get(request.sid)
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
-    if df.loc[username, 'penize'] + data['pocet']*50 < 0:
+    if df.loc[username, 'penize'] + data['pocet']*100 < 0:
         emit('chyba', {'zprava': 'Nemohu provést, tvé peníze by klesli pod nulu! Nejprve vrať chybně provedené placení, pak až vracej úlohu.'})
         return
-    tabulka(username, 'body', data['pocet']*50) # body za úlohu
-    emit('penize', {'penize': tabulka(username, 'penize', data['pocet']*50)})
+    tabulka(username, 'body', data['pocet']*100) # body za úlohu
+    emit('penize', {'penize': tabulka(username, 'penize', data['pocet']*100)})
     emit('pocetuloh', {'pocetuloh': tabulka(username, 'ulohy', data['pocet'])})
 
 @socketio.on('zvedni')
@@ -311,19 +309,19 @@ def zvedni(data):
     vec = df.loc[tym, faktor]
     
     if smer == 1:
-        penize = tabulka(tym, 'penize', -25*(vec+2))
+        penize = tabulka(tym, 'penize', -50*(vec+2))
         if penize == False:
             emit('chyba', {'zprava': "Nemáš dostatek peněz na vylepšení"})
         else:
             emit('penize', {'penize': penize})
-            emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(25*(vec+3))})
+            emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(50*(vec+3))})
     else:
         stav = tabulka(tym, faktor, -1)
         if stav == False:
             emit('chyba', {'zprava': "Máš nejnižší možný faktor"})
         else:
-            emit('penize', {'penize': tabulka(tym, 'penize', 25*(vec+1))})
-            emit('faktory', {'faktor': faktor, 'cislo': stav, 'dalsicena': str(25*(vec+1))})
+            emit('penize', {'penize': tabulka(tym, 'penize', 50*(vec+1))})
+            emit('faktory', {'faktor': faktor, 'cislo': stav, 'dalsicena': str(50*(vec+1))})
 
 
 #   ZAVODY

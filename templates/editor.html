@@ -6,8 +6,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
     <script src="static/editor.js"></script>
     <link href="static/styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 </head>
-<body id="bodyeditor">
+<body >
+    <div id="bodyeditor">
     <div style="display:flex; flex-direction:column; grid-column:1/3; grid-row:1" class="okenko">
         <button id="casovacb" onclick="StartTimer()">Spustit hru</button>
         <button id="vypnib" onclick="Vypni()">Ukončit a Ohodnotit</button>
@@ -26,6 +28,7 @@
         <button onclick="sendMessage()" class="zprava">Poslat zprávu</button>
         <h4>Tvá komunikace:</h4>
         <ul id="messages" style="display:flex; flex-direction:column-reverse"></ul>
+    </div>
     </div>
 </body>
 </html>

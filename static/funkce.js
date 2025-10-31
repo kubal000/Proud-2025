@@ -38,8 +38,8 @@ function ToHrac() {
     document.getElementById("bodyhrac").style.backgroundColor = "rgb(255, 200, 0)";
 }
 
-
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
+
 
 window.addEventListener("load", () => {
     const urlParams = new URLSearchParams(window.location.search);

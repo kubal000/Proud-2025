@@ -1,16 +1,96 @@
+#bodyhrac {
+    width: 60%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+    grid-template-rows: auto auto auto auto;
+}
+
+#bodyeditor {
+    width: 60%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+}
+
+#bodyplatno {
+    width: 80%;
+    font-size: 150%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+}
+
+body {
+    font-size: 22px;
+}
+
+
+@media only screen and (max-width: 1600px) and (min-width: 1400px) {
+    body {
+        font-size: 19px;
+    }
+
+    #bodyeditor {
+        width: 70%;
+    }
+    #bodyhrac {
+        width: 70%;
+    }
+    }
+@media only screen and (max-width: 1400px) and (min-width: 1100px) {
+    body {
+        font-size: 16px;
+    }
+    #bodyeditor {
+        width: 85%;
+    }
+    #bodyhrac {
+        width: 85%;
+    }
+}
+@media only screen and (max-width: 1100px) and (min-width: 900px) {
+    body {
+        font-size: 13px;
+    }
+    #bodyeditor {
+        width: 100%;
+    }
+    #bodyhrac {
+        width: 100%;
+    }
+}
+@media only screen and (max-width: 900px) {
+    body {
+        font-size: 10px;
+    }
+    #bodyeditor {
+        width: 100%;
+    }
+    #bodyhrac {
+        width: 100%;
+    }
+}
+
+
 
 
 ul {
     list-style-type: none;
+    margin: 0;
+    padding: 0.5em;
 }
 
 button {
-    border-radius: 5px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    border-radius: 0.3em;
+    padding-top: 0.1em;
+    padding-bottom: 0.15em;
     background-color: rgb(200, 140, 0);
-    border: 1px solid rgb(150, 100, 0);
-    margin: 2px;
+    border: 0.1em solid rgb(150, 100, 0);
+    margin-left: 0.15em;
+    font-size: 80%;
 }
 
     button:hover {
@@ -34,39 +114,31 @@ button {
     display: inline-block;
     background-color: aqua;
 }
-
+h1 {
+    font-size: 200%;
+}
 
 h5 {
-    margin-bottom: 5px;
-    margin-top: 5px;
-    font-size: 20px;
+    margin-bottom: 0.3em;
+    margin-top: 0.3em;
+    font-size: 120%;
 }
 
 h3 {
-    font-size: 30px;
+    font-size: 150%;
     margin-bottom: 0;
 }
 body {
-    width: 1000px;
-    margin: auto;
     background-color: rgb(255, 200, 0);
     text-align: center;
+    margin: 0;
 }
-#bodyhrac {
-    display: grid;
-    grid-template-columns: 2fr 5fr;
-    grid-template-rows: auto auto auto auto;
-}
-#bodyeditor {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
-}
+
 #casovacb {
     width: 50%;
-    height: 20px;
+    height: 1.3em;
     margin: auto;
-    margin-top: 10px;
+    margin-top: 0.75em;
 }
 
 #vypnib {
@@ -75,7 +147,7 @@ body {
 .zprava {
     width: 50%;
     margin: auto;
-    margin-top: 5px;
+    margin-top: 0.3em;
 }
 .staty {
     grid-column: 1/4;
@@ -85,16 +157,43 @@ body {
     justify-content: space-around;
     
 }
-.trasa {
-    width: 29.7%;
-    margin-top: 1em;
-}
-
 .okenko {
     background-color: rgb(255, 215, 60);
-    margin: 5px;
-    border-radius: 10px;
+    margin: 0.3em;
+    border-radius: 0.6em;
 }
+
+.oknostabem {
+    position: relative;
+    top: -1.5em;
+}
+.l.oknostabem {
+    text-align: left;
+}
+.r.oknostabem {
+    text-align: right;
+}
+
+.oknostabem h2 {
+    background-color: rgb(255, 215, 60);
+    margin: 0.3em 0.3em 0 0.3em;
+    border-top-left-radius: 0.6em;
+    border-top-right-radius: 0.6em;
+    display: inline-block;
+    font-size: 100%;
+    padding: 0.3em;
+}
+.oknostabem .okenko {
+    margin: 0 0.3em 0 0.3em;
+}
+.oknostabem.l .okenko {
+    border-top-left-radius: 0;
+}
+.oknostabem.r .okenko {
+    border-top-right-radius: 0;
+}
+
+
 .nadpis {
   grid-column: 1/3;
   grid-row: 1/2;
@@ -124,9 +223,9 @@ body {
 }
 
 .faktor {
-    margin: 5px;
+    margin: 0.3em;
 }
 .faktorbutton {
-    margin-left: 5px;
+    margin-left: 0.3em;
 }
 
