@@ -61,16 +61,24 @@
             <p>Počet odevzdaných úloh: <span id="pocetuloh">error</span></p>
 
         </div>
-        <div class="zavody bloky hra okenko">
+        <div class="zavody bloky hra okenko tabulka">
             <h3>Závody</h3>
             <h4>K příhlášení:</h4>
-            <ul id="prihlasovani"></ul>
+            <table id="prihlasovani">
+                <tr><th class='l ctvrtka'>Trasa</th><th class='r petina'>Start</th><th class='r petina'>Začíná za</th><th class='r velky'><span class="hrac">Přihlaš</span></th></tr>
+            </table>
             <h4>Přihlášeno:</h4>
-            <ul id="prihlaseno"></ul>
+            <table id="prihlaseno">
+                <tr><th class='l ctvrtka'>Trasa</th><th class='r maly'>Start</th><th class='r maly'>Začíná za</th><th class='r maly'>Formule</th><th class='r maly'><span class="plavcik">Odhlaš</span></th></tr>
+            </table>
             <h4>Probíhá:</h4>
-            <ul id="jizda"></ul>
+            <table id="jizda">
+                <tr><th class='l ctvrtka'>Trasa</th><th class='r maly'>Start</th><th class='r maly'>Končí za</th><th class='r maly'>Formule</th><th class="r" style="width:18.75%;"><span class="plavcik">Odhlaš</span></th></tr>
+            </table>
             <h4>Proběhlé:</h4>
-            <ul id="probehle"></ul>
+            <table id="probehle">
+                <tr><th class='l ctvrtka'>Trasa</th><th class='r ctvrtka'>Start</th><th class='r ctvrtka'>Body</th><th class='r ctvrtka'>Formule</th></tr>
+            </table>
         </div>
         <h2 class="hranone okenko">Zde se zobrazí herní prvky...</h2>
         <div class="komunikace okenko">

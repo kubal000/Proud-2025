@@ -16,7 +16,7 @@ function StartTimer() {
 function Vypni() {
     document.getElementById("vypnib").style.display = "none";
     document.getElementById("casovacb").style.display = "block"; // Zobraz tlačítko pro spuštění časovače
-    document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
+    document.body.style.backgroundColor = "rgb(255, 200, 0)";
     socket.emit('vypni');
 }
 
@@ -58,7 +58,7 @@ socket.on('casovac', (data) => {
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel"
         document.getElementById("vypnib").style.display = "block";
-        document.getElementById("bodyeditor").style.backgroundColor = "grey";
+        document.body.style.backgroundColor = "grey";
         
     } else if (button.style.display !== 'none'){
         button.style.display = 'none'

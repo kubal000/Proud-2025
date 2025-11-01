@@ -43,7 +43,7 @@ socket.on('casovac', (data) => {
     
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel";
-        document.getElementById("bodyeditor").style.backgroundColor = "grey";
+        document.body.style.backgroundColor = "grey";
     } else {
         document.getElementById("casovac").textContent = data.cas;      
     }
@@ -54,13 +54,12 @@ socket.on('hra', function (data) {
     const stav = data.zprava;
 
     if (stav === 'Hra zacina') {
-        document.getElementById("prihlasovani").innerHTML = "";
-        document.getElementById("jizda").innerHTML = "";
-        document.getElementById("probehle").innerHTML = "";
-        document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
+        document.getElementById("prihlasovani").innerHTML = "<tr><th class='l'>Trasa</th><th class='r'>Start</th><th class='r'>Začíná za</th></tr>";
+        document.getElementById("jizda").innerHTML = "<tr><th class='l'>Trasa</th><th class='r'>Start</th><th class='r'>Končí za</th></tr>";
+        document.body.style.backgroundColor = "rgb(255, 200, 0)";
     }
     if (stav === 'Vypni') {
-        document.getElementById("bodyeditor").style.backgroundColor = "rgb(255, 200, 0)";
+        document.body.style.backgroundColor = "rgb(255, 200, 0)";
     }
 })
 
@@ -74,14 +73,14 @@ socket.on('zavod', (data) => {
         const kategorie = document.getElementById('prihlasovani')
         let zavod = document.getElementById(idz);
         if (!zavod) {
-            zavod = document.createElement("li");
+            zavod = document.createElement("tr");
             zavod.id = idz;
-            zavod.innerHTML = data.trasa + "<br/> start: " + data.start + " min, začíná za: " + data.cas
+            zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td class='r'>" + data.cas + "</td>"
             kategorie.appendChild(zavod);           
         }
         else {
             let text = document.getElementById(idz)
-            text.innerHTML = data.trasa + "<br/> start: " + data.start + " min, začíná za: " + data.cas
+            text.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td class='r'>" + data.cas + "</td>"
         }
     } else if (data.stav === 'start') {
         let zavod = document.getElementById(idz);
@@ -91,14 +90,14 @@ socket.on('zavod', (data) => {
         const kategorie = document.getElementById('jizda')
         let zavod = document.getElementById(idz);
         if (!zavod) {
-            zavod = document.createElement("li");
+            zavod = document.createElement("tr");
             zavod.id = idz;
-            zavod.innerHTML = data.trasa + "<br/> start: " + data.start + " min, končí za: " + data.cas
+            zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td class='r'>" + data.cas + "</td>"
             kategorie.appendChild(zavod);
         }
         else {
             let zavod = document.getElementById(idz)
-            zavod.innerHTML = data.trasa + "<br/> start: " + data.start + " min, končí za: " + data.cas
+            zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td class='r'>" + data.cas + "</td>"
         }
     } else if (data.stav === 'cil') {
         idz = idz + 'j'
@@ -106,3 +105,8 @@ socket.on('zavod', (data) => {
         zavod.remove()
     }
 })
+
+function formatStart(value) {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n.toFixed(1) : String(value);
+}

@@ -30,12 +30,12 @@ function Init() {
 
 function ToPlavcik() {
     document.getElementById("bodyhrac").classList.add("plavcik-mode");
-    document.getElementById("bodyhrac").style.backgroundColor = "aqua";
+    document.body.style.backgroundColor = "aqua";
 }
 
 function ToHrac() {
     document.getElementById("bodyhrac").classList.remove("plavcik-mode");
-    document.getElementById("bodyhrac").style.backgroundColor = "rgb(255, 200, 0)";
+    document.body.style.backgroundColor = "rgb(255, 200, 0)";
 }
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
@@ -88,86 +88,55 @@ socket.on('receive_message', function (data) {
 socket.on('zavod', (data) => {
     let idz = data.trasa + data.start
     if (data.stav === 'prihlasovani') {
-        const kategorie = document.getElementById('prihlasovani')
         let zavod = document.getElementById(idz);
         if (!zavod) {
-            zavod = document.createElement("li");
+            const kategorie = document.getElementById('prihlasovani')
+            zavod = document.createElement("tr");
             zavod.id = idz;
+            zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td id='" + idz + "cas' class='r'>" + data.cas + "</td><td class='r'><button class='hrac' onclick = 'Prihlas(" + '"' + data.trasa + '"' + ", " + data.start + ", " + '"A"' + ")'>Formuli A</button><button class='hrac' onclick = 'Prihlas(" + '"' + data.trasa + '"' + ", "+data.start+", "+'"B"'+")'>Formuli B</button></td>"
             kategorie.appendChild(zavod);
-            let text = document.createElement('label')
-            text.id = idz + 'label'
-            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas
-            zavod.appendChild(text);
-            let buttonA = document.createElement('button')
-            buttonA.textContent = "Přihlásit formuli A"
-            buttonA.classList = "hrac"
-            buttonA.onclick = () => Prihlas(data.trasa, data.start, "A")
-            zavod.appendChild(buttonA);
-            let buttonB = document.createElement('button')
-            buttonB.textContent = "Přihlásit formuli B"
-            buttonB.classList = "hrac"
-            buttonB.onclick = () => Prihlas(data.trasa, data.start, "B")
-            zavod.appendChild(buttonB);
         }
         else {
-            let text = document.getElementById(idz + 'label')
-            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas
+            let text = document.getElementById(idz + 'cas')
+            text.innerHTML = data.cas
         }
     } else if (data.stav === 'prihlaseno') {
         let zavod = document.getElementById(idz);
         if (!zavod) {
             const kategorie = document.getElementById('prihlaseno')
-            zavod = document.createElement("li");
+            zavod = document.createElement("tr");
             zavod.id = idz;
+            zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td id='" + idz + "cas' class='r'>" + data.cas + "</td><td class='r'>" + data.formule + "</td><td class='r'><button class='plavcik' onclick = 'Odhlas(" + '"' + data.trasa + '"' + ", " + data.start + ")'>Odhlásit</button></td>";
             kategorie.appendChild(zavod);
-            let text = document.createElement('label')
-            text.id = idz + 'label'
-            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
-            zavod.appendChild(text);
-            let button = document.createElement('button')
-            button.textContent = "Odhlásit"
-            button.classList = "plavcik"
-            button.onclick = () => Odhlas(data.trasa, data.start)
-            zavod.appendChild(button);
         }
         else {
-            let text = document.getElementById(idz + 'label')
-            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, začíná za: " + data.cas + " Přihlášena formule " + data.formule;
+            let text = document.getElementById(idz + 'cas')
+            text.innerHTML = data.cas
         }
     } else if (data.stav === 'start') {
         let zavod = document.getElementById(idz);
         zavod.remove()
     } else if (data.stav === 'jizda') {
-        idz = idz
         const kategorie = document.getElementById('jizda')
         let zavod = document.getElementById(idz);
         if (!zavod) {
-            zavod = document.createElement("li");
+            zavod = document.createElement("tr");
             zavod.id = idz;
+            zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r'>" + data.printstart + "</td><td id='" + idz + "cas' class='r'>" + data.cas + "</td><td class='r'>" + data.formule + "</td><td class='r  '><button class='plavcik' onclick = 'Odhlas(" + '"' + data.trasa + '"' + ", " + data.start + ")'>Odhlásit</button></td>";
             kategorie.appendChild(zavod);
-            let text = document.createElement('label')
-            text.id = idz + 'label'
-            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
-            zavod.appendChild(text);
-            let button = document.createElement('button')
-            button.textContent = "Odhlásit"
-            button.classList = "plavcik"
-            button.onclick = () => Odhlas(data.trasa, data.start)
-            zavod.appendChild(button);
         }
         else {
-            let text = document.getElementById(idz + 'label')
-            text.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, formule " + data.formule + ", poběží ještě: " + data.cas;
+            let text = document.getElementById(idz + 'cas')
+            text.innerHTML = data.cas
         }
     } else if (data.stav === 'cil') {
-        idz = idz
         let zavod = document.getElementById(idz);
         zavod.remove()
     } else if (data.stav === 'hodnoceni') {
         const kategorie = document.getElementById('probehle');
-        let zavod = document.createElement('li');
-        zavod.id = idz
-        zavod.textContent = "Závod: " + data.trasa + ", start: " + data.start + " min, skončil. Formule " + data.formule + " ti přinesla: " + data.zisk + " bodů.";
+        let zavod = document.createElement('tr');
+        zavod.id = idz;
+        zavod.innerHTML = "<td class='l'>" + data.trasa + "</td><td class='r  '>" + data.printstart + "</td><td class='r'>" + data.zisk + "</td><td class='r '>" + data.formule + "</td>";
         kategorie.appendChild(zavod);
     }
 })
@@ -189,13 +158,13 @@ socket.on('hra', function (data) {
         })
     }
     if (stav === 'Hra konci') {
-        document.getElementById("bodyhrac").style.backgroundColor = "grey";
+        document.body.style.backgroundColor = "grey";
     }
     if (stav === 'Vypni') {
         prvky.forEach(el => {
             el.style.display = 'none';
         })
-        document.getElementById("bodyhrac").style.backgroundColor = "rgb(255, 200, 0)";
+        document.body.style.backgroundColor = "rgb(255, 200, 0)";
         prvkynone.forEach(el => {
             el.style.display = 'block';
         })

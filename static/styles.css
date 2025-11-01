@@ -16,16 +16,19 @@
 
 #bodyplatno {
     width: 80%;
-    font-size: 150%;
+    font-size: 175%;
     margin: auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
 }
 
 body {
     font-size: 22px;
+    box-sizing: border-box;
 }
+
+
 
 
 @media only screen and (max-width: 1600px) and (min-width: 1400px) {
@@ -105,6 +108,12 @@ button {
 .plavcik {
     display: none;
 }
+.plavcikbunka{
+    display: none;
+}
+.hracbunka {
+    display: table-cell;
+}
 
 /* Mód plavèík */
 .plavcik-mode .hrac {
@@ -113,6 +122,12 @@ button {
 .plavcik-mode .plavcik {
     display: inline-block;
     background-color: aqua;
+}
+.plavcik-mode .plavcikbunka {
+    display: table-cell;
+}
+.plavcik-mode .hracbunka {
+    display: none;
 }
 h1 {
     font-size: 200%;
@@ -167,10 +182,10 @@ body {
     position: relative;
     top: -1.5em;
 }
-.l.oknostabem {
+.l {
     text-align: left;
 }
-.r.oknostabem {
+.r {
     text-align: right;
 }
 
@@ -229,3 +244,34 @@ body {
     margin-left: 0.3em;
 }
 
+.okenko table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.okenko th,.okenko td {
+    border-bottom: 1px solid rgb(200, 140, 0);
+    height: 1.5em;
+}
+
+.oknostabem th.l {
+    width: 40%
+}
+
+.oknostabem th.r {
+    width: 30%
+}
+.okenko.tabulka {
+    padding: 0.5em 1.5em 0.5em 1.5em;
+}
+.zavody.bloky.hra.okenko.tabulka .velky {
+    width: 35%;
+}
+.zavody.bloky.hra.okenko.tabulka .ctvrtka {
+    width: 25%;
+}
+.zavody.bloky.hra.okenko.tabulka .petina {
+    width: 20%;
+}
+.zavody.bloky.hra.okenko.tabulka .maly {
+    width: 18.75%;
+}

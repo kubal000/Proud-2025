@@ -17,14 +17,14 @@ sid_to_username = {} # sid → jméno
 herni_stav = "nebezi"
 
 a = [
-    ['Monako', 80, []], ['Velká Británie', 76.5, []], ['Itálie', 73, []], ['Japonsko', 69.5, []], ['Saudská Arábie', 66, []], ['Belgie', 62.5, []], 
-    ['Itálie', 59, []], ['Monako', 55.5, []], ['Japonsko', 52, []], ['Belgie', 48.5, []], ['Monako', 45, []], ['Velká Británie', 41.5, []], 
-    ['Saudská Arábie', 38, []], ['Velká Británie', 34.5, []], ['Itálie', 31, []], ['Belgie', 27.5, []], ['Japonsko', 24, []], ['Saudská Arábie', 20.5, []], 
-    ['Monako', 17, []], ['Belgie', 13.5, []], ['Itálie', 10, []], ['Velká Británie', 6.5, []], ['Japonsko', 3, []], ['Belgie', 0, []], 
-    ['Japonsko', 0, []], ['Monako', 0, []], ['Saudská Arábie', 0, []], ['Velká Británie', 0, []], ['Itálie', 0, []]
+    ['Monako', 80.0, []], ['Velká Británie', 76.5, []], ['Itálie', 73.0, []], ['Japonsko', 69.5, []], ['Saudská Arábie', 66.0, []], ['Belgie', 62.5, []], 
+    ['Itálie', 59.0, []], ['Monako', 55.5, []], ['Japonsko', 52.0, []], ['Belgie', 48.5, []], ['Monako', 45.0, []], ['Velká Británie', 41.5, []], 
+    ['Saudská Arábie', 38.0, []], ['Velká Británie', 34.5, []], ['Itálie', 31.0, []], ['Belgie', 27.5, []], ['Japonsko', 24.0, []], ['Saudská Arábie', 20.5, []], 
+    ['Monako', 17.0, []], ['Belgie', 13.5, []], ['Itálie', 10.0, []], ['Velká Británie', 6.5, []], ['Japonsko', 3.0, []], ['Belgie', 0.0, []], 
+    ['Japonsko', 0.0, []], ['Monako', 0.0, []], ['Saudská Arábie', 0.0, []], ['Velká Británie', 0.0, []], ['Itálie', 0.0, []]
 ]
 b = [
-    80, 76.5, 73, 69.5, 66, 62.5, 59, 55.5, 52, 48.5, 45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17, 13.5, 10, 6.5, 3, 0, 0, 0, 0, 0, 0
+    80.0, 76.5, 73.0, 69.5, 66.0, 62.5, 59.0, 55.5, 52.0, 48.5, 45.0, 41.5, 38.0, 34.5, 31.0, 27.5, 24.0, 20.5, 17.0, 13.5, 10.0, 6.5, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 ]
 
 min = 1# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
@@ -40,7 +40,10 @@ def NulujTabulku():
     PosliTabulkuEditorovi()
 
 def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce hry v sekundách, start - čas startu závodu v minutách zbývajících do konce hry
-    print(f'Závod {trasa} začíná za 10 min v čase: {start}')
+    
+    printstart = f'{int(start//60):02d}:{int((start%60)//1):02d}:{int((start%1)*60):02d}'
+    
+    print(f'Závod {trasa} začíná za 10 min v čase: {printstart}')
     df = pd.read_csv("zavody.csv", encoding='utf-8')
     df.set_index('stat', inplace=True)
     jizda = int(df.loc[trasa, 'cas']) # čas jízdy v minutách
@@ -54,14 +57,14 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         s = zbyva % 60
         for username, sid in usernames.items():
             if [username, "A"] in a[index][2]:
-                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "A"}, to=sid)
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'printstart':printstart, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "A"}, to=sid)
             elif [username, 'B'] in a[index][2]:
-                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "B"}, to=sid)
+                socketio.emit('zavod', {'stav':'prihlaseno', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'printstart':printstart, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor, 'formule': "B"}, to=sid)
             else:
-                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)      
+                socketio.emit('zavod', {'stav':'prihlasovani', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'printstart':printstart, 'start':start, 'jizda': jizda, 'brzda': brzda, 'motor':motor}, to=sid)      
         socketio.sleep(1 - (time.time() % 1))
     for username, sid in usernames.items():
-        socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
+        socketio.emit('zavod', {'stav': 'start', 'cas': '00:00:00', 'trasa': trasa, 'printstart':printstart, 'start':start, }, to=sid)
     dftymy = pd.read_csv("tymy.csv", encoding='utf-8')
     dftymy.set_index('tym', inplace=True)
     
@@ -76,15 +79,15 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
         for zavodnik in a[index][2]:
             sid = usernames.get(zavodnik[0])
             formule = zavodnik[1]
-            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start, 'formule': formule}, to=sid)
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'printstart':printstart, 'start':start, 'formule': formule}, to=sid)
         sid = usernames.get("Platno")
         if sid:
-            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'start':start}, to=sid)    
+            socketio.emit('zavod', {'stav':'jizda', 'cas': f'{int(m):02d}:{int(s):02d}', 'trasa': trasa, 'printstart':printstart, 'start':start, }, to=sid)    
         socketio.sleep(1 - (time.time() % 1))
     for zavodnik in a[index][2]:
         sid = usernames.get(zavodnik[0])
-        socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=sid)
-    socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'start':start}, to=usernames.get("Platno"))
+        socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'printstart':printstart, 'start':start, }, to=sid)
+    socketio.emit('zavod', {'stav': 'cil', 'cas': '00:00:00', 'trasa': trasa, 'printstart':printstart, 'start':start, }, to=usernames.get("Platno"))
     
     dataoformulich = {}
     for i in range(len(a[index][2])):
@@ -112,12 +115,12 @@ def ZahajZavod(trasa, start, konechry, index): # konechry - reálný čas konce 
     while misto >= 0.55 and serazeno != []:
         obodovat = serazeno.pop(0)
         for zavodnik in obodovat:
-            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': int(misto * maxzisk)}, to=usernames.get(zavodnik[0]))
+            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'printstart':printstart, 'start':start, 'formule': zavodnik[1], 'zisk': int(misto * maxzisk)}, to=usernames.get(zavodnik[0]))
             tabulka(zavodnik[0], 'body', int(misto * maxzisk))
         misto -= 0.05 * len(obodovat)
     for misto in serazeno:
         for zavodnik in misto:
-            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'start': start, 'formule': zavodnik[1], 'zisk': int(0.5 * maxzisk)}, to=usernames.get(zavodnik[0]))
+            socketio.emit('zavod', {'stav': 'hodnoceni', 'trasa': trasa, 'printstart':printstart, 'start':start, 'formule': zavodnik[1], 'zisk': int(0.5 * maxzisk)}, to=usernames.get(zavodnik[0]))
             tabulka(zavodnik[0], 'body', int(0.5 * maxzisk))
 
 
@@ -409,7 +412,7 @@ def Vypni():
         while seznamkrazeni and seznamkrazeni[-1][2] == prvek[0][2]:
                 prvek.append(seznamkrazeni.pop())
         serazeno.append(prvek)
-    maxzisk = 500 # maximální zisk za závod, 100% zisk
+    maxzisk = 1000 # maximální zisk za závod, 100% zisk
     misto = 1
     while misto >= 0.55 and serazeno != []:
         obodovat = serazeno.pop(0)
