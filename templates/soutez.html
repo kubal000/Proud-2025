@@ -54,14 +54,14 @@
                 </div>
             </div>
         </div>
-        <div class="ulohy bloky hra okenko">
+        <div class="ulohy hra okenko">
             <h3>Odevzdání úlohy</h3>
             <button onclick="Uloha(1)" class="hrac">Odevzdat další</button>
             <button onclick="Uloha(-1)" class="plavcik">Ubrat úlohu</button>
             <p>Počet odevzdaných úloh: <span id="pocetuloh">error</span></p>
 
         </div>
-        <div class="zavody bloky hra okenko tabulka">
+        <div class="zavody hra okenko tabulka">
             <h3>Závody</h3>
             <h4>K příhlášení:</h4>
             <table id="prihlasovani">
@@ -82,9 +82,9 @@
         </div>
         <h2 class="hranone okenko">Zde se zobrazí herní prvky...</h2>
         <div class="komunikace okenko">
-            <div><h2>Plavčík</h2><button onclick="ToPlavcik()" class="hrac" style="background-color:aqua">Zapni mód pro Plavčíka</button><button onclick="ToHrac()" class="plavcik">Zapni mód pro Hráče</button></div>
+            <div><h2>Plavčík</h2><button onclick="ToPlavcik()" class="hrac zmena">Zapni mód pro Plavčíka</button><button onclick="ToHrac()" class="plavcik zmena">Zapni mód pro Hráče</button></div>
             <p>Zde si můžeš popovídat s člověkem u hlavního počítače.</p>
-            <label>Příjemce: <span id="target_user">Editor</span></label>
+            <p>Příjemce: <span id="target_user">Editor</span></p>
             <textarea id="message" placeholder="Napište zprávu..." class="zprava"></textarea>
             <button onclick="sendMessage()" class="zprava">Poslat zprávu</button>
             <h2>Tvá komunikace:</h2>

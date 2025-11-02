@@ -17,11 +17,11 @@ sid_to_username = {} # sid → jméno
 herni_stav = "nebezi"
 
 a = [
-    ['Monako', 80.0, []], ['Velká Británie', 76.5, []], ['Itálie', 73.0, []], ['Japonsko', 69.5, []], ['Saudská Arábie', 66.0, []], ['Belgie', 62.5, []], 
+    ['Monako', 80.0, []], ['Velká Británie', 76.5, []], ['Itálie', 73.0, []], ['Japonsko', 69.5, []], ['Saúdská Arábie', 66.0, []], ['Belgie', 62.5, []], 
     ['Itálie', 59.0, []], ['Monako', 55.5, []], ['Japonsko', 52.0, []], ['Belgie', 48.5, []], ['Monako', 45.0, []], ['Velká Británie', 41.5, []], 
-    ['Saudská Arábie', 38.0, []], ['Velká Británie', 34.5, []], ['Itálie', 31.0, []], ['Belgie', 27.5, []], ['Japonsko', 24.0, []], ['Saudská Arábie', 20.5, []], 
+    ['Saúdská Arábie', 38.0, []], ['Velká Británie', 34.5, []], ['Itálie', 31.0, []], ['Belgie', 27.5, []], ['Japonsko', 24.0, []], ['Saúdská Arábie', 20.5, []], 
     ['Monako', 17.0, []], ['Belgie', 13.5, []], ['Itálie', 10.0, []], ['Velká Británie', 6.5, []], ['Japonsko', 3.0, []], ['Belgie', 0.0, []], 
-    ['Japonsko', 0.0, []], ['Monako', 0.0, []], ['Saudská Arábie', 0.0, []], ['Velká Británie', 0.0, []], ['Itálie', 0.0, []]
+    ['Japonsko', 0.0, []], ['Monako', 0.0, []], ['Saúdská Arábie', 0.0, []], ['Velká Británie', 0.0, []], ['Itálie', 0.0, []]
 ]
 b = [
     80.0, 76.5, 73.0, 69.5, 66.0, 62.5, 59.0, 55.5, 52.0, 48.5, 45.0, 41.5, 38.0, 34.5, 31.0, 27.5, 24.0, 20.5, 17.0, 13.5, 10.0, 6.5, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
