@@ -147,6 +147,7 @@ def casovac(tym, cas):
     ZpravaVsem('Hra zacina', 'hra')
     herni_stav = 'bezi'
     konec = time.time() + cas
+    beep = False
     while True:
         zbyva = int(konec - time.time())
         for cislo in casy[:]:
@@ -164,8 +165,10 @@ def casovac(tym, cas):
         h = zbyva // 3600
         m = (zbyva % 3600) // 60
         s = zbyva % 60
-        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=usernames.get(tym))
-        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}'}, to=usernames.get("Platno"))
+        if zbyva <= 10 and not beep:
+            beep = True
+        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}', 'beep': beep}, to=usernames.get(tym))
+        socketio.emit('casovac', {'cas': f'{h:02d}:{m:02d}:{s:02d}', 'beep': beep}, to=usernames.get("Platno"))
         socketio.sleep(1 - (time.time() % 1))
 
 def PosliTabulkuEditorovi():

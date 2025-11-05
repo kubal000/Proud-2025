@@ -11,6 +11,7 @@ function sendMessage() {
 function StartTimer() {
     socket.emit('start_timer', {'cas': 90});
     document.getElementById("casovacb").style.display = "none"; // Skryj tlačítko pro spuštění časovače 
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
 function Vypni() {
@@ -21,6 +22,8 @@ function Vypni() {
 }
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
+let audioCtx;
+
 
 window.addEventListener("load", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -59,9 +62,24 @@ socket.on('casovac', (data) => {
         document.getElementById("casovac").textContent = "Čas vypršel"
         document.getElementById("vypnib").style.display = "block";
         document.body.style.backgroundColor = "grey";
+        const oscillator = audioCtx.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 900;
+        oscillator.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 1);
         
     } else if (button.style.display !== 'none'){
         button.style.display = 'none'
+    }
+    if (data.beep) {
+        document.body.style.backgroundColor = "orange";
+        const oscillator = audioCtx.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 442;
+        oscillator.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
     }
 });
 

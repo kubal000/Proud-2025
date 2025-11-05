@@ -1,4 +1,6 @@
-﻿function Resize() {
+﻿
+
+function Resize() {
     const cas = document.getElementById('casovac');
     const nad = document.querySelectorAll('.oknostabem h2')[0];
     const okna = document.querySelectorAll('.oknostabem .okenko');
@@ -29,7 +31,6 @@
 window.addEventListener('resize', Resize)
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
-
 window.addEventListener("load", () => {
     Resize();
     const urlParams = new URLSearchParams(window.location.search);
@@ -40,12 +41,14 @@ window.addEventListener("load", () => {
 });
 
 socket.on('casovac', (data) => {
-    
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel";
         document.body.style.backgroundColor = "grey";
-    } else {
+    } else if (data.beep) {
+        document.body.style.backgroundColor = "orange";
         document.getElementById("casovac").textContent = data.cas;      
+    } else {
+        document.getElementById("casovac").textContent = data.cas;
     }
 });
 
