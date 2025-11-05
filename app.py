@@ -17,14 +17,14 @@ sid_to_username = {} # sid → jméno
 herni_stav = "nebezi"
 
 a = [
-    ['Monako', 80.0, []], ['Velká Británie', 76.5, []], ['Itálie', 73.0, []], ['Japonsko', 69.5, []], ['Saúdská Arábie', 66.0, []], ['Belgie', 62.5, []], 
-    ['Itálie', 59.0, []], ['Monako', 55.5, []], ['Japonsko', 52.0, []], ['Belgie', 48.5, []], ['Monako', 45.0, []], ['Velká Británie', 41.5, []], 
-    ['Saúdská Arábie', 38.0, []], ['Velká Británie', 34.5, []], ['Itálie', 31.0, []], ['Belgie', 27.5, []], ['Japonsko', 24.0, []], ['Saúdská Arábie', 20.5, []], 
-    ['Monako', 17.0, []], ['Belgie', 13.5, []], ['Itálie', 10.0, []], ['Velká Británie', 6.5, []], ['Japonsko', 3.0, []], ['Belgie', 0.0, []], 
+    ['Itálie', 70.0, []], ['Japonsko', 66.5, []], ['Saúdská Arábie', 63.0, []], ['Belgie', 59.5, []], 
+    ['Itálie', 56.0, []], ['Monako', 52.5, []], ['Japonsko', 49.0, []], ['Belgie', 45.5, []], ['Monako', 42.0, []], ['Velká Británie', 38.5, []], 
+    ['Saúdská Arábie', 35.0, []], ['Velká Británie', 31.5, []], ['Itálie', 28.0, []], ['Belgie', 24.5, []], ['Japonsko', 21.0, []], ['Saúdská Arábie', 17.5, []], 
+    ['Monako', 14.0, []], ['Belgie', 10.5, []], ['Itálie', 7.0, []], ['Velká Británie', 3.5, []], ['Belgie', 0.0, []], 
     ['Japonsko', 0.0, []], ['Monako', 0.0, []], ['Saúdská Arábie', 0.0, []], ['Velká Británie', 0.0, []], ['Itálie', 0.0, []]
 ]
 b = [
-    80.0, 76.5, 73.0, 69.5, 66.0, 62.5, 59.0, 55.5, 52.0, 48.5, 45.0, 41.5, 38.0, 34.5, 31.0, 27.5, 24.0, 20.5, 17.0, 13.5, 10.0, 6.5, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+    70.0, 66.5, 63.0, 59.5, 56.0, 52.5, 49.0, 45.5, 42.0, 38.5, 35.0, 31.5, 28.0, 24.5, 21.0, 17.5, 14.0, 10.5, 7.0, 3.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 ]
 
 min = 1# nastavení délky minut v sekundách - pracovní urychlení hry za zachování časů v minutách...
@@ -245,7 +245,7 @@ def init():
     emit('penize', {'penize': str(df.loc[tym, 'penize'])})
     emit('pocetuloh', {'pocetuloh': str(df.loc[tym, 'ulohy'])})
     for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
-        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(50*(df.loc[tym, faktor]+2))})
+        emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(100*(df.loc[tym, faktor]+2))})
     PosliTabulkuEditorovi()
 
 #@socketio.on('connect') # automaticky zavoláno při připojení - pokud nereaguji, není třeba mít.
@@ -294,11 +294,11 @@ def uloha(data):
     username = sid_to_username.get(request.sid)
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
-    if df.loc[username, 'penize'] + data['pocet']*100 < 0:
+    if df.loc[username, 'penize'] + data['pocet']*200 < 0:
         emit('chyba', {'zprava': 'Nemohu provést, tvé peníze by klesli pod nulu! Nejprve vrať chybně provedené placení, pak až vracej úlohu.'})
         return
-    tabulka(username, 'body', data['pocet']*100) # body za úlohu
-    emit('penize', {'penize': tabulka(username, 'penize', data['pocet']*100)})
+    tabulka(username, 'body', data['pocet']*200) # body za úlohu
+    emit('penize', {'penize': tabulka(username, 'penize', data['pocet']*200)})
     emit('pocetuloh', {'pocetuloh': tabulka(username, 'ulohy', data['pocet'])})
 
 @socketio.on('zvedni')
@@ -312,19 +312,19 @@ def zvedni(data):
     vec = df.loc[tym, faktor]
     
     if smer == 1:
-        penize = tabulka(tym, 'penize', -50*(vec+2))
+        penize = tabulka(tym, 'penize', -100*(vec+2))
         if penize == False:
             emit('chyba', {'zprava': "Nemáš dostatek peněz na vylepšení"})
         else:
             emit('penize', {'penize': penize})
-            emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(50*(vec+3))})
+            emit('faktory', {'faktor': faktor, 'cislo': tabulka(tym, faktor, 1), 'dalsicena': str(100*(vec+3))})
     else:
         stav = tabulka(tym, faktor, -1)
         if stav == False:
             emit('chyba', {'zprava': "Máš nejnižší možný faktor"})
         else:
-            emit('penize', {'penize': tabulka(tym, 'penize', 50*(vec+1))})
-            emit('faktory', {'faktor': faktor, 'cislo': stav, 'dalsicena': str(50*(vec+1))})
+            emit('penize', {'penize': tabulka(tym, 'penize', 100*(vec+1))})
+            emit('faktory', {'faktor': faktor, 'cislo': stav, 'dalsicena': str(100*(vec+1))})
 
 
 #   ZAVODY
