@@ -26,8 +26,10 @@
 body {
     font-size: 22px;
     box-sizing: border-box;
+    background-color: rgb(255, 180, 30);
+    text-align: center;
+    margin: 0;
 }
-
 
 
 
@@ -133,6 +135,22 @@ button, .plavcik.zmena {
 .plavcik-mode .hracbunka {
     display: none;
 }
+
+
+
+/* Mód plavèík */
+.ending-mode {
+    background-color: rgb(255, 80, 0);
+}
+.end-mode {
+    background-color: grey;
+}
+.plavcik-mode {
+    background-color: aqua;
+}
+
+
+
 h1 {
     font-size: 200%;
 }
@@ -147,11 +165,7 @@ h3 {
     font-size: 150%;
     margin-bottom: 0;
 }
-body {
-    background-color: rgb(255, 200, 0);
-    text-align: center;
-    margin: 0;
-}
+
 
 #casovacb {
     width: 50%;
@@ -162,6 +176,10 @@ body {
 
 #vypnib {
     display: none;
+    width: 50%;
+    height: 1.3em;
+    margin: auto;
+    margin-top: 0.75em;
 }
 .zprava {
     width: 50%;
@@ -179,7 +197,7 @@ textarea, input {
     
 }
 .okenko {
-    background-color: rgb(255, 215, 60);
+    background-color: rgb(255, 230, 150);
     margin: 0.3em;
     border-radius: 0.6em;
 }
@@ -196,7 +214,7 @@ textarea, input {
 }
 
 .oknostabem h2 {
-    background-color: rgb(255, 215, 60);
+    background-color: rgb(255, 230, 150);
     margin: 0.3em 0.3em 0 0.3em;
     border-top-left-radius: 0.6em;
     border-top-right-radius: 0.6em;

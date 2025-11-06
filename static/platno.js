@@ -43,9 +43,11 @@ window.addEventListener("load", () => {
 socket.on('casovac', (data) => {
     if (data.cas === '00:00:00') {
         document.getElementById("casovac").textContent = "Čas vypršel";
-        document.body.style.backgroundColor = "grey";
+        document.body.classList.add("end-mode");
+        document.body.classList.remove("ending-mode");
     } else if (data.beep) {
-        document.body.style.backgroundColor = "orange";
+        document.body.classList.remove("end-mode");
+        document.body.classList.add("ending-mode");
         document.getElementById("casovac").textContent = data.cas;      
     } else {
         document.getElementById("casovac").textContent = data.cas;
@@ -59,10 +61,12 @@ socket.on('hra', function (data) {
     if (stav === 'Hra zacina') {
         document.getElementById("prihlasovani").innerHTML = "<tr><th class='l'>Trasa</th><th class='r'>Start</th><th class='r'>Začíná za</th></tr>";
         document.getElementById("jizda").innerHTML = "<tr><th class='l'>Trasa</th><th class='r'>Start</th><th class='r'>Končí za</th></tr>";
-        document.body.style.backgroundColor = "rgb(255, 200, 0)";
+        document.body.classList.remove("end-mode");
+        document.body.classList.remove("ending-mode");
     }
     if (stav === 'Vypni') {
-        document.body.style.backgroundColor = "rgb(255, 200, 0)";
+        document.body.classList.remove("end-mode");
+        document.body.classList.remove("ending-mode");
     }
 })
 
@@ -105,7 +109,7 @@ socket.on('zavod', (data) => {
     } else if (data.stav === 'cil') {
         idz = idz + 'j'
         let zavod = document.getElementById(idz);
-        zavod.remove()
+        if (zavod) zavod.remove()
     }
 })
 

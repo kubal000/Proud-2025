@@ -29,13 +29,11 @@ function Init() {
 }
 
 function ToPlavcik() {
-    document.getElementById("bodyhrac").classList.add("plavcik-mode");
-    document.body.style.backgroundColor = "aqua";
+    document.body.classList.add("plavcik-mode");
 }
 
 function ToHrac() {
-    document.getElementById("bodyhrac").classList.remove("plavcik-mode");
-    document.body.style.backgroundColor = "rgb(255, 200, 0)";
+    document.body.classList.remove("plavcik-mode");
 }
 
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
@@ -131,7 +129,7 @@ socket.on('zavod', (data) => {
         }
     } else if (data.stav === 'cil') {
         let zavod = document.getElementById(idz);
-        zavod.remove()
+        if (zavod) zavod.remove()
     } else if (data.stav === 'hodnoceni') {
         const kategorie = document.getElementById('probehle');
         let zavod = document.createElement('tr');
@@ -143,12 +141,19 @@ socket.on('zavod', (data) => {
 
 
 socket.on('hra', function (data) {
-    
+
     const stav = data.zprava;
     const prvky = document.querySelectorAll('.hra')
     const prvkynone = document.querySelectorAll('.hranone')
     if (stav === 'Hra zacina') {
+        document.body.classList.remove("end-mode");
+        document.body.classList.remove("ending-mode");
+        document.body.classList.remove("plavcik-mode");
         socket.emit('init')
+        document.getElementById("prihlasovani").innerHTML = "<tr><th class='l ctvrtka'>Trasa</th><th class='r petina'>Start</th><th class='r petina'>Začíná za</th><th class='r velky'><span class='hrac'>Přihlaš</span></th></tr>";
+        document.getElementById("jizda").innerHTML = "<tr><th class='l ctvrtka'>Trasa</th><th class='r maly'>Start</th><th class='r maly'>Končí za</th><th class='r maly'>Formule</th><th class='r' style='width: 18.75 %; '><span class='plavcik'>Odhlaš</span></th></tr>";
+        document.getElementById("prihlaseno").innerHTML = "<tr><th class='l ctvrtka'>Trasa</th><th class='r maly'>Start</th><th class='r maly'>Začíná za</th><th class='r maly'>Formule</th><th class='r maly'><span class='plavcik'>Odhlaš</span></th></tr>"
+        document.getElementById("probehle").innerHTML = "<tr><th class='l ctvrtka'>Trasa</th><th class='r ctvrtka'>Start</th><th class='r ctvrtka'>Body</th><th class='r ctvrtka'>Formule</th></tr>"
         prvky.forEach(el => {
             el.style.display = 'block';
         })
@@ -158,15 +163,21 @@ socket.on('hra', function (data) {
         })
     }
     if (stav === 'Hra konci') {
-        document.body.style.backgroundColor = "grey";
+        document.body.classList.remove("ending-mode");
+        document.body.classList.add("end-mode");
     }
     if (stav === 'Vypni') {
         prvky.forEach(el => {
             el.style.display = 'none';
         })
-        document.body.style.backgroundColor = "rgb(255, 200, 0)";
+        document.body.classList.remove("end-mode");
         prvkynone.forEach(el => {
             el.style.display = 'block';
         })
     }
-})
+});
+
+socket.on('hra', function (data) {
+    if (data.beep)
+        document.body.classList.add("ending-mode");
+});

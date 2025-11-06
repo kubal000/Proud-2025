@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import pandas as pd
 import time
+import datetime
 import copy
 
 
@@ -155,7 +156,7 @@ def casovac(tym, cas):
                 casy.pop(casy.index(cislo))
                 data = ZavodNalezeni(cislo, data, konec)
                 break
-        if zbyva <= 0:
+        if zbyva <= 0 or herni_stav == 'nebezi':
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get(tym))
             socketio.emit('casovac', {'cas': '00:00:00'}, to=usernames.get("Platno"))
             ZpravaVsem('Hra konci', 'hra')
@@ -177,7 +178,6 @@ def PosliTabulkuEditorovi():
         df = pd.read_csv("tymy.csv")
         columns = ['tym'] + [col for col in df.columns if col != 'tym']
         data = df[columns].to_dict(orient='records')
-        
         socketio.emit('tabulka', {'columns': columns, 'rows': data}, to=Editor)
 
 def tabulka(tym, pole, cislo):
@@ -243,13 +243,19 @@ def init():
     df = pd.read_csv("tymy.csv")
     df.set_index('tym', inplace=True)
     if tym not in df.index:
-        df.loc[tym] = [0, 0, 0, 0, 0, 0, 0]           # nastavení základních hodnot
+        df.loc[tym] = [0, 0, 0, 0, 0, 0, 0, datetime.datetime.now()]           # nastavení základních hodnot
         df.to_csv('tymy.csv', index=True)
     emit('penize', {'penize': str(df.loc[tym, 'penize'])})
     emit('pocetuloh', {'pocetuloh': str(df.loc[tym, 'ulohy'])})
     for faktor in ['A_motor','A_brzda','B_motor','B_brzda']:
         emit('faktory', {'faktor': faktor, 'cislo': str(df.loc[tym, faktor]), 'dalsicena': str(100*(df.loc[tym, faktor]+2))})
     PosliTabulkuEditorovi()
+
+@socketio.on('initeditor')
+def initeditor():
+    global herni_stav
+    emit('herni_stav', {'herni_stav': herni_stav})
+
 
 #@socketio.on('connect') # automaticky zavoláno při připojení - pokud nereaguji, není třeba mít.
 #def handle_connect():
@@ -266,6 +272,7 @@ def handle_register_username(data):
         df = pd.read_csv("tymy.csv")
         if herni_stav == 'bezi' and username in df['tym'].values:
             emit('hra', {'zprava':'Hra zacina'})
+    PosliTabulkuEditorovi()
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -303,6 +310,13 @@ def uloha(data):
     tabulka(username, 'body', data['pocet']*200) # body za úlohu
     emit('penize', {'penize': tabulka(username, 'penize', data['pocet']*200)})
     emit('pocetuloh', {'pocetuloh': tabulka(username, 'ulohy', data['pocet'])})
+
+
+    df = pd.read_csv("tymy.csv")
+    df.set_index('tym', inplace=True)
+    df.loc[username, 'cas_posledni_ulohy'] = datetime.datetime.now()
+    df.to_csv('tymy.csv', index=True)
+    PosliTabulkuEditorovi()
 
 @socketio.on('zvedni')
 def zvedni(data):
@@ -387,9 +401,12 @@ def start_timer(data):
 
 @socketio.on('vypni')
 def Vypni():
+    # KONEC HRY
     global herni_stav
+    herni_stav = 'nebezi'
+    ZpravaVsem('Vypni', 'hra')
 
-
+# KONEČNÝ ZÁVOD
     print(f'Konečný závod začíná!!!')
     dftymy = pd.read_csv("tymy.csv", encoding='utf-8')
     dftymy.set_index('tym', inplace=True)
@@ -426,8 +443,14 @@ def Vypni():
         for zavodnik in misto:
             tabulka(zavodnik[0][0], 'body', int(0.5 * maxzisk))
 
-    herni_stav = 'nebezi'
-    ZpravaVsem('Vypni', 'hra')
+
+# VYHODNOCENÍ  Body -> Úlohy -> Peníze
+    dftymy = pd.read_csv("tymy.csv", encoding='utf-8')
+    dftymy.set_index('tym', inplace=True)
+    
+    serazeno = dftymy.sort_values(by=['body', 'ulohy', 'cas_posledni_ulohy'], ascending=[False, False, True])
+    serazeno.to_csv('tymy.csv', index=True)
+    PosliTabulkuEditorovi()
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000)
